@@ -1,0 +1,10 @@
+{
+  "module": {
+    "type": "umd"
+  },
+  "jsc": {
+    "parser": {
+      "syntax": "typescript"
+    }
+  }
+}
