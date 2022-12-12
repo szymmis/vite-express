@@ -9,7 +9,7 @@ const { NODE_ENV } = process.env;
 
 const MODE = NODE_ENV === "production" ? NODE_ENV : "development";
 const PORT = 5173;
-const VITE_HOST = `http://127.0.0.1:${PORT}`;
+const VITE_HOST = `http://localhost:${PORT}`;
 
 function serveStatic() {
   if (MODE === "production") {
@@ -41,8 +41,12 @@ async function serveDevelopment(app: core.Express) {
   app.use(serveStatic());
 
   app.get("/*", async (_, res) => {
-    const content = await fetch(VITE_HOST).then((res) => res.text());
-    res.header("Content-Type", "text/html").send(content);
+    fetch(VITE_HOST)
+      .then((res) => res.text())
+      .then((content) =>
+        content.replace(/(\/@react-refresh|\/@vite\/client)/g, `${VITE_HOST}$1`)
+      )
+      .then((content) => res.header("Content-Type", "text/html").send(content));
   });
 
   await server.listen();
