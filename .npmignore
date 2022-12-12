@@ -1,5 +1,6 @@
 lib
 rome.json
 tsconfig.json
-.swcrc
+rollup.config.js
+yarn-error.log
 *.tgz

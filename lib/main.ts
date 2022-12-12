@@ -3,6 +3,7 @@ import core from "express-serve-static-core";
 import path from "path";
 import { createServer, build, resolveConfig } from "vite";
 import fetch from "node-fetch";
+import { info } from "./lib";
 
 const { NODE_ENV } = process.env;
 
@@ -23,13 +24,15 @@ function serveStatic() {
 }
 
 async function serveProduction(app: core.Express) {
+  info("Building Vite app...");
   await build();
   const config = await resolveConfig({}, "build");
-  console.log(path.resolve(__dirname, config.root, config.build.outDir));
   app.use(e.static(path.resolve(__dirname, config.root, config.build.outDir)));
+  info("Build completed!");
 }
 
 async function serveDevelopment(app: core.Express) {
+  info("Vite dev server is starting...");
   const server = await createServer({
     clearScreen: false,
     server: { port: PORT },
@@ -43,6 +46,7 @@ async function serveDevelopment(app: core.Express) {
   });
 
   await server.listen();
+  info(`Vite dev server is listening on port ${PORT}!`);
 }
 
 async function serve(app: core.Express) {
@@ -56,4 +60,4 @@ async function listen(app: core.Express, port: number, callback: () => void) {
   app.listen(port, callback);
 }
 
-export = { static: serveStatic, serve, listen };
+export default { static: serveStatic, serve, listen };
