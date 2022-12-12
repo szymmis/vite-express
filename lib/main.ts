@@ -1,8 +1,9 @@
-import e from "express";
+import express from "express";
 import core from "express-serve-static-core";
-import path from "path";
-import { createServer, build, resolveConfig } from "vite";
 import fetch from "node-fetch";
+import path from "path";
+import { build, createServer, resolveConfig } from "vite";
+
 import { info } from "./lib";
 
 const { NODE_ENV } = process.env;
@@ -11,23 +12,23 @@ const MODE = NODE_ENV === "production" ? NODE_ENV : "development";
 const PORT = 5173;
 const VITE_HOST = `http://localhost:${PORT}`;
 
-function serveStatic() {
-  if (MODE === "production") {
-    return (_: e.Request, __: e.Response, next: e.NextFunction) => next();
+function serveStatic(app: core.Express) {
+  if (MODE === "development") {
+    app.use((req, res, next) => {
+      if (req.path.match(/(\.\w+$)|(@react-refresh|@vite)/))
+        return res.redirect(`${VITE_HOST}${req.path}`);
+      next();
+    });
   }
-
-  return (req: e.Request, res: e.Response, next: e.NextFunction) => {
-    if (req.path.match(/(\.\w+$)|(@react-refresh|@vite)/))
-      return res.redirect(`${VITE_HOST}${req.path}`);
-    next();
-  };
 }
 
 async function serveProduction(app: core.Express) {
   info("Building Vite app...");
   await build();
   const config = await resolveConfig({}, "build");
-  app.use(e.static(path.resolve(__dirname, config.root, config.build.outDir)));
+  app.use(
+    express.static(path.resolve(__dirname, config.root, config.build.outDir))
+  );
   info("Build completed!");
 }
 
@@ -38,7 +39,7 @@ async function serveDevelopment(app: core.Express) {
     server: { port: PORT },
   });
 
-  app.use(serveStatic());
+  serveStatic(app);
 
   app.get("/*", async (_, res) => {
     fetch(VITE_HOST)
