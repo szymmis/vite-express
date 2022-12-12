@@ -4,3 +4,4 @@ tsconfig.json
 rollup.config.js
 yarn-error.log
 *.tgz
+playground
