@@ -5,6 +5,12 @@
 [![downloads-per-week](https://img.shields.io/npm/dt/vite-express?color=red)](https://www.npmjs.org/package/vite-express)
 [![license](https://img.shields.io/npm/l/vite-express?color=purple)](https://www.npmjs.org/package/vite-express)
 
+- [💬 Introduction](#-introduction)
+- [🤔 How does it work?](#-how-does-it-work)
+- [📦🔧 Installation \& usage](#-installation--usage)
+- [📝 Documentation](#-documentation)
+- [🏦 License](#-license)
+
 ## 💬 Introduction
 
 The best thing about `Vite` is how easy it is to configure and start writing your app. That is also a main goal of `vite-express` - to have a minimal configuration needed because it is coding and not configuring what developers should spend their time on.
