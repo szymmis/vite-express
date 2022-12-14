@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
+  "author": "szymmis",
+  "repository": "https://github.com/szymmis/vite-express",
+  "description": "Vite integration module for Express",
   "license": "MIT",
   "scripts": {
     "build": "rollup --config rollup.config.js --bundleConfigAsCjs",
