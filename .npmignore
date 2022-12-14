@@ -1,8 +1,0 @@
-lib
-rome.json
-tsconfig.json
-rollup.config.js
-yarn-error.log
-*.tgz
-playground
-.vscode
