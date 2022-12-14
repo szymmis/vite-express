@@ -64,16 +64,16 @@ That way static files requests shouldn't be blocked by your auth middleware.
 
 The easiest way to setup a basic **Vite Express** app is to use [`create-vite` package](https://vitejs.dev/guide/#scaffolding-your-first-vite-project) to setup the front-end and then add an express server to it.
 
-- Start by creating **Vite** project
+ 1. Start by creating **Vite** project
 ```bash
 $ yarn create vite
 ```
- - Follow the prompts to configure your project using your favourite framework.
- - Install `express` and `vite-express` packages 
+ 2. Follow the prompts to configure your project using your favourite framework.
+ 3. Install `express` and `vite-express` packages 
 ```bash
 $ yarn add express vite-express
 ```
- - Create a server script inside project root directory
+ 4. Create a server script inside project root directory
 ```javascript
 //e.g server.js
 import express from "express";
@@ -86,14 +86,15 @@ app.get("/message", (_, res) => res.send("Hello from express!"));
 ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
 ```
  ⚠️ For some frameworks like **React**, **Vite** sets the `package.json` `type` field to `module` so you need to use ESModules `import` syntax despite writing a node script. If that's a problem you can freely change the `type` back to `commonjs` as Vite uses `ESModules` for front-end either way!
- - Run the express script
+
+ 5. Run the express script
 ```bash
 $ node server.js
 ```
- - Open your browser at `http://localhost:3000`
- - Change the client code and see the beauty of [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement) in action!
- - Congrats, you've just created your first `vite-express` app! 🎉 
- - Happy hacking!
+ 6. Open your browser at `http://localhost:3000`
+ 7. Change the client code and see the beauty of [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement) in action!
+
+Congrats, you've just created your first `vite-express` app! 🎉 Happy hacking!
 ## 📝 Documentation
 
 **🚧 Work in progress 🚧**
