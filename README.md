@@ -6,8 +6,8 @@
 [![license](https://img.shields.io/npm/l/vite-express?color=purple)](https://www.npmjs.org/package/vite-express)
 
 - [💬 Introduction](#-introduction)
-- [🤔 How does it work?](#-how-does-it-work)
 - [📦🔧 Installation \& usage](#-installation--usage)
+- [🤔 How does it work?](#-how-does-it-work)
 - [📝 Documentation](#-documentation)
 - [🏦 License](#-license)
 
@@ -34,31 +34,6 @@ ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
 - manage unhandled routes to make **client-side routing** possible
 
 The only thing that is left to you is **to code**! 🎉 
-
-## 🤔 How does it work?
-
-The way it works is very simple, thanks to [**Vite's** wonderfully simple API](https://vitejs.dev/guide/api-javascript.html).
- - First we need you register middlewares which will make our server act like a proxy that will forward our static files related traffic to **Vite dev server**
- - We also need to register a get route handler that will catch all un-handled routes from your app. We do this to make client-side routing possible. The way it works inside **vite-express** is that there is a `get("/*")` route. That is why `ViteExpress.listen()` needs to be called after your last `get` route. Otherwise it will be handled by **vite-express** and not your API.
- - Lastly we start up **Vite dev server** that listens on port **5173** and for now ⚠️ this can't be changed ⚠️ due to the way internals works.  It will be hopefully resolved soon.
- - All the necesary configuration is taken from **Vite** config file, so you don't need to worry about additional configs. 
-The fact that you need to start-up `vite-express` so late in your app might cause trouble when you have some kind of *auth* middleware. Because the *static files* middleware is registered when you invoke `ViteExpress.listen()`, it could be blocked by auth. That's why there is a `ViteExpress.static()` method exposed that let's you manually register a middleware to serve the *static files*.
-
-***Example***
-```javascript
-const express = require("express");
-const ViteExpress = require("vite-express");
-
-const app = express();
-
-ViteExpress.static(app);
-app.use(authMiddleware());
-
-app.get("/message", (_, res) => res.send("Hello from express!"));
-
-ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
-```
-That way static files requests shouldn't be blocked by your auth middleware.
 
 ## 📦🔧 Installation & usage
 
@@ -95,6 +70,31 @@ $ node server.js
  7. Change the client code and see the beauty of [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement) in action!
 
 Congrats, you've just created your first `vite-express` app! 🎉 Happy hacking!
+
+## 🤔 How does it work?
+
+The way it works is very simple, thanks to [**Vite's** wonderfully simple API](https://vitejs.dev/guide/api-javascript.html).
+ - First we need you register middlewares which will make our server act like a proxy that will forward our static files related traffic to **Vite dev server**
+ - We also need to register a get route handler that will catch all un-handled routes from your app. We do this to make client-side routing possible. The way it works inside **vite-express** is that there is a `get("/*")` route. That is why `ViteExpress.listen()` needs to be called after your last `get` route. Otherwise it will be handled by **vite-express** and not your API.
+ - Lastly we start up **Vite dev server** that listens on port **5173** and for now ⚠️ this can't be changed ⚠️ due to the way internals works.  It will be hopefully resolved soon.
+ - All the necesary configuration is taken from **Vite** config file, so you don't need to worry about additional configs. 
+The fact that you need to start-up `vite-express` so late in your app might cause trouble when you have some kind of *auth* middleware. Because the *static files* middleware is registered when you invoke `ViteExpress.listen()`, it could be blocked by auth. That's why there is a `ViteExpress.static()` method exposed that let's you manually register a middleware to serve the *static files*.
+
+***Example***
+```javascript
+const express = require("express");
+const ViteExpress = require("vite-express");
+
+const app = express();
+
+ViteExpress.static(app);
+app.use(authMiddleware());
+
+app.get("/message", (_, res) => res.send("Hello from express!"));
+
+ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
+```
+That way static files requests shouldn't be blocked by your auth middleware.
 ## 📝 Documentation
 
 **🚧 Work in progress 🚧**
