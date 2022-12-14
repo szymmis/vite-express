@@ -7,7 +7,8 @@
   "scripts": {
     "build": "rollup --config rollup.config.js --bundleConfigAsCjs",
     "dev": "yarn build --watch",
-    "playground": "cd playground && nodemon index.ts --watch index.ts --watch ../dist"
+    "playground": "cd playground && nodemon index.ts --watch index.ts --watch ../dist",
+    "format": "rome format lib --write"
   },
   "dependencies": {
     "node-fetch": "^2.0.0"

@@ -3,7 +3,6 @@ import core from "express-serve-static-core";
 import fetch from "node-fetch";
 import path from "path";
 import { build, createServer, resolveConfig } from "vite";
-
 import { info } from "./lib";
 
 const { NODE_ENV } = process.env;
@@ -27,7 +26,7 @@ async function serveProduction(app: core.Express) {
   await build();
   const config = await resolveConfig({}, "build");
   app.use(
-    express.static(path.resolve(__dirname, config.root, config.build.outDir))
+    express.static(path.resolve(__dirname, config.root, config.build.outDir)),
   );
   info("Build completed!");
 }
@@ -45,7 +44,10 @@ async function serveDevelopment(app: core.Express) {
     fetch(VITE_HOST)
       .then((res) => res.text())
       .then((content) =>
-        content.replace(/(\/@react-refresh|\/@vite\/client)/g, `${VITE_HOST}$1`)
+        content.replace(
+          /(\/@react-refresh|\/@vite\/client)/g,
+          `${VITE_HOST}$1`,
+        ),
       )
       .then((content) => res.header("Content-Type", "text/html").send(content));
   });

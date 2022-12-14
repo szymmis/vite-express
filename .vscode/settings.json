@@ -1,0 +1,6 @@
+{
+  "editor.defaultFormatter": "rome.rome",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  }
+}
