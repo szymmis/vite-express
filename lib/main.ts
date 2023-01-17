@@ -2,62 +2,89 @@ import express from "express";
 import core from "express-serve-static-core";
 import fetch from "node-fetch";
 import path from "path";
-import { build, createServer, resolveConfig } from "vite";
-import { info } from "./lib";
+import colors from "picocolors";
+import * as Vite from "vite";
 
 const { NODE_ENV } = process.env;
 
-const MODE = NODE_ENV === "production" ? NODE_ENV : "development";
-const PORT = 5173;
-const VITE_HOST = `http://localhost:${PORT}`;
+const Config = {
+  mode: (NODE_ENV === "production" ? "production" : "development") as
+    | "production"
+    | "development",
+  vitePort: 5173,
+};
+
+function getViteHost() {
+  return `http://localhost:${Config.vitePort}`;
+}
+
+function info(msg: string) {
+  const timestamp = new Date().toLocaleString("en-US").split(",")[1].trim();
+  console.log(
+    `${colors.dim(timestamp)} ${colors.bold(
+      colors.cyan("[vite-express]")
+    )} ${colors.green(msg)}`
+  );
+}
+
+function isStaticFilePath(path: string) {
+  return path.match(/\.\w+$/);
+}
 
 function serveStatic(app: core.Express) {
-  if (MODE === "development") {
+  if (Config.mode === "development") {
     app.use((req, res, next) => {
-      if (req.path.match(/(\.\w+$)|(@react-refresh|@vite)/))
-        return res.redirect(`${VITE_HOST}${req.path}`);
-      next();
+      if (isStaticFilePath(req.path)) {
+        fetch(`${getViteHost()}${req.path}`).then((response) => {
+          if (!response.ok) return next();
+          res.redirect(response.url);
+        });
+      } else next();
     });
   }
 }
 
 async function serveProduction(app: core.Express) {
-  info("Building Vite app...");
-  await build();
-  const config = await resolveConfig({}, "build");
+  const config = await Vite.resolveConfig({}, "build");
   app.use(
-    express.static(path.resolve(__dirname, config.root, config.build.outDir)),
+    express.static(path.resolve(__dirname, config.root, config.build.outDir))
   );
-  info("Build completed!");
 }
 
 async function serveDevelopment(app: core.Express) {
   info("Vite dev server is starting...");
-  const server = await createServer({
+  const server = await Vite.createServer({
     clearScreen: false,
-    server: { port: PORT },
+    server: { port: Config.vitePort },
   });
 
   serveStatic(app);
 
-  app.get("/*", async (_, res) => {
-    fetch(VITE_HOST)
+  app.get("/*", async (req, res, next) => {
+    if (isStaticFilePath(req.path)) return next();
+
+    fetch(getViteHost())
       .then((res) => res.text())
       .then((content) =>
         content.replace(
           /(\/@react-refresh|\/@vite\/client)/g,
-          `${VITE_HOST}$1`,
-        ),
+          `${getViteHost()}$1`
+        )
       )
       .then((content) => res.header("Content-Type", "text/html").send(content));
   });
 
   await server.listen();
-  info(`Vite dev server is listening on port ${PORT}!`);
+  info(`Vite dev server is listening on port ${Config.vitePort}!`);
+}
+
+function config(config: Partial<typeof Config>) {
+  if (config.mode) Config.mode = config.mode;
+  if (config.vitePort) Config.vitePort = config.vitePort;
 }
 
 async function serve(app: core.Express) {
-  MODE === "production"
+  Config.mode === "production"
     ? await serveProduction(app)
     : await serveDevelopment(app);
 }
@@ -67,4 +94,10 @@ async function listen(app: core.Express, port: number, callback: () => void) {
   app.listen(port, callback);
 }
 
-export default { static: serveStatic, serve, listen };
+async function build() {
+  info("Building Vite app...");
+  await Vite.build();
+  info("Build completed!");
+}
+
+export default { config, listen, static: serveStatic, build };
