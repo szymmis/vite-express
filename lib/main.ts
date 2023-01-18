@@ -3,7 +3,7 @@ import core from "express-serve-static-core";
 import fetch from "node-fetch";
 import path from "path";
 import colors from "picocolors";
-import * as Vite from "vite";
+import Vite from "vite";
 
 const { NODE_ENV } = process.env;
 
@@ -31,8 +31,13 @@ function isStaticFilePath(path: string) {
   return path.match(/\.\w+$/);
 }
 
-function serveStatic(app: core.Express) {
-  if (Config.mode === "development") {
+async function serveStatic(app: core.Express) {
+  if (Config.mode === "production") {
+    const config = await Vite.resolveConfig({}, "build");
+    app.use(
+      express.static(path.resolve(__dirname, config.root, config.build.outDir))
+    );
+  } else {
     app.use((req, res, next) => {
       if (isStaticFilePath(req.path)) {
         fetch(`${getViteHost()}${req.path}`).then((response) => {
@@ -44,21 +49,12 @@ function serveStatic(app: core.Express) {
   }
 }
 
-async function serveProduction(app: core.Express) {
-  const config = await Vite.resolveConfig({}, "build");
-  app.use(
-    express.static(path.resolve(__dirname, config.root, config.build.outDir))
-  );
-}
-
-async function serveDevelopment(app: core.Express) {
+async function startDevServer(app: core.Express) {
   info("Vite dev server is starting...");
   const server = await Vite.createServer({
     clearScreen: false,
     server: { port: Config.vitePort },
   });
-
-  serveStatic(app);
 
   app.get("/*", async (req, res, next) => {
     if (isStaticFilePath(req.path)) return next();
@@ -84,12 +80,11 @@ function config(config: Partial<typeof Config>) {
 }
 
 async function serve(app: core.Express) {
-  Config.mode === "production"
-    ? await serveProduction(app)
-    : await serveDevelopment(app);
+  await serveStatic(app);
+  if (Config.mode === "development") await startDevServer(app);
 }
 
-async function listen(app: core.Express, port: number, callback: () => void) {
+async function listen(app: core.Express, port: number, callback?: () => void) {
   await serve(app);
   app.listen(port, callback);
 }
@@ -100,4 +95,4 @@ async function build() {
   info("Build completed!");
 }
 
-export default { config, listen, static: serveStatic, build };
+export default { build, config, listen, serve, static: serveStatic };
