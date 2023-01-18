@@ -32,6 +32,7 @@ function isStaticFilePath(path: string) {
 }
 
 async function serveStatic(app: core.Express) {
+  info(`Running in ${colors.yellow(Config.mode)} mode`);
   if (Config.mode === "production") {
     const config = await Vite.resolveConfig({}, "build");
     app.use(
@@ -50,7 +51,6 @@ async function serveStatic(app: core.Express) {
 }
 
 async function startDevServer(app: core.Express) {
-  info("Vite dev server is starting...");
   const server = await Vite.createServer({
     clearScreen: false,
     server: { port: Config.vitePort },
@@ -71,7 +71,10 @@ async function startDevServer(app: core.Express) {
   });
 
   await server.listen();
-  info(`Vite dev server is listening on port ${Config.vitePort}!`);
+
+  info(
+    `Vite is listening ${colors.gray(`http://localhost:${Config.vitePort}`)}`,
+  );
 }
 
 function config(config: Partial<typeof Config>) {
