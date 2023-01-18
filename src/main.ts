@@ -22,8 +22,8 @@ function info(msg: string) {
   const timestamp = new Date().toLocaleString("en-US").split(",")[1].trim();
   console.log(
     `${colors.dim(timestamp)} ${colors.bold(
-      colors.cyan("[vite-express]")
-    )} ${colors.green(msg)}`
+      colors.cyan("[vite-express]"),
+    )} ${colors.green(msg)}`,
   );
 }
 
@@ -35,7 +35,7 @@ async function serveStatic(app: core.Express) {
   if (Config.mode === "production") {
     const config = await Vite.resolveConfig({}, "build");
     app.use(
-      express.static(path.resolve(__dirname, config.root, config.build.outDir))
+      express.static(path.resolve(__dirname, config.root, config.build.outDir)),
     );
   } else {
     app.use((req, res, next) => {
@@ -64,8 +64,8 @@ async function startDevServer(app: core.Express) {
       .then((content) =>
         content.replace(
           /(\/@react-refresh|\/@vite\/client)/g,
-          `${getViteHost()}$1`
-        )
+          `${getViteHost()}$1`,
+        ),
       )
       .then((content) => res.header("Content-Type", "text/html").send(content));
   });

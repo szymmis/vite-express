@@ -10,7 +10,7 @@
   "scripts": {
     "build": "rollup --config rollup.config.js --bundleConfigAsCjs",
     "dev": "yarn build --watch",
-    "format": "rome format lib --write"
+    "format": "rome format src --write"
   },
   "dependencies": {
     "node-fetch": "^2.0.0"
