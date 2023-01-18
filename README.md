@@ -5,14 +5,12 @@
 [![downloads-per-week](https://img.shields.io/npm/dt/vite-express?color=red)](https://www.npmjs.org/package/vite-express)
 [![license](https://img.shields.io/npm/l/vite-express?color=purple)](https://www.npmjs.org/package/vite-express)
 
-- [💬 Introduction](#-introduction)
-- [📦🔧 Installation \& usage](#-installation--usage)
+- [📦 Installation \& usage](#-installation--usage)
 - [🚚 Shipping to production](#-shipping-to-production)
 - [🤔 How does it work?](#-how-does-it-work)
 - [📝 Documentation](#-documentation)
-- [🏦 License](#-license)
 
-## 💬 Introduction
+## 💬 Introduction <!-- omit in toc -->
 
 The best thing about `Vite` is how easy it is to configure and start writing your app. That is also a main goal of `vite-express` - to have a minimal configuration needed because it is coding and not configuring what developers should spend their time on.
 
@@ -36,7 +34,7 @@ ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
 
 The only thing that is left to you is **to code**! 🎉 
 
-## 📦🔧 Installation & usage
+## 📦 Installation & usage
 
 The easiest way to setup a basic **Vite Express** app is to use [`create-vite` package](https://vitejs.dev/guide/#scaffolding-your-first-vite-project) to setup the front-end and then add an express server to it.
 
@@ -111,6 +109,6 @@ That way static files requests shouldn't be blocked by your auth middleware.
 
 **🚧 Work in progress 🚧**
 
-## 🏦 License
+## 🏦 License <!-- omit in toc -->
 
 [MIT](LICENSE)
