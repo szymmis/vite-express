@@ -125,6 +125,6 @@ That way static files requests shouldn't be blocked by your auth middleware.
 
 🚧 **Work in progress** 🚧
 
-## 🏦 License <!-- omit in toc -->
+## ⚖️ License <!-- omit in toc -->
 
 [MIT](LICENSE)
