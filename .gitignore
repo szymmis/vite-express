@@ -1,3 +1,4 @@
-node_modules
-dist
 *.tgz
+dist
+examples/**/yarn.lock
+node_modules
