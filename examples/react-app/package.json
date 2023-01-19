@@ -1,6 +1,5 @@
 {
-  "name": "react-app",
-  "license": "MIT",
+  "private": "true",
   "scripts": {
     "dev": "nodemon src/index.ts",
     "start": "NODE_ENV=production ts-node src/index.ts",
