@@ -35,6 +35,8 @@ The only thing that is left to you is **to code**! 🎉
 
 ## 📦 Installation & usage
 
+> You can see more examples [here](examples)
+
 The easiest way to setup a basic **Vite Express** app is to use [`create-vite` package](https://vitejs.dev/guide/#scaffolding-your-first-vite-project) to setup the front-end and then add an express server to it.
 
  1. Start by creating **Vite** project
