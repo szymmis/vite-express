@@ -6,10 +6,7 @@
 [![downloads-per-week](https://img.shields.io/npm/dt/vite-express?color=red)](https://www.npmjs.org/package/vite-express)
 [![license](https://img.shields.io/npm/l/vite-express?color=purple)](https://www.npmjs.org/package/vite-express)
 
-- [📦 Installation \& usage](#-installation--usage)
-- [🚚 Shipping to production](#-shipping-to-production)
-- [🤔 How does it work?](#-how-does-it-work)
-- [📝 Documentation](#-documentation)
+[📦 Installation \& usage](#-installation--usage) • [🚚 Shipping to production](#-shipping-to-production) • [🤔 How does it work?](#-how-does-it-work) • [📝 Documentation](#-documentation)
 
 ## 💬 Introduction <!-- omit in toc -->
 
