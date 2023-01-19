@@ -1,6 +1,6 @@
 # ⚡ Vite + Express
 
-> @vitejs integration module for @expressjs
+> [@vitejs](https://github.com/vitejs/vite) integration module for [@expressjs](https://github.com/expressjs/express)
 
 [![bundle-size](https://img.shields.io/bundlephobia/minzip/vite-express)](https://www.npmjs.org/package/vite-express)
 [![downloads-per-week](https://img.shields.io/npm/dt/vite-express?color=red)](https://www.npmjs.org/package/vite-express)
@@ -34,7 +34,7 @@ ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
 - registering necessary middlewares to serve **static files** from your API
 - manage unhandled routes to make **client-side routing** possible
 
-The only thing that is left to you is **to code**! 🎉 
+The only thing that is left to you is **to code**! 🎉
 
 ## 📦 Installation & usage
 
