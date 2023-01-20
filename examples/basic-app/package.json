@@ -1,8 +1,8 @@
 {
   "private": "true",
   "scripts": {
-    "dev": "nodemon src/index.ts",
-    "start": "NODE_ENV=production ts-node src/index.ts",
+    "dev": "nodemon src/server.ts",
+    "start": "NODE_ENV=production ts-node src/server.ts",
     "build": "yarn vite build"
   },
   "dependencies": {

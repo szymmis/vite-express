@@ -1,27 +1,30 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export function App() {
   const [count, setCount] = useState(0);
   const [data, setData] = useState<string>();
 
-  useEffect(() => {
+  const fetchAPI = () =>
     fetch("/hello")
       .then((res) => res.text())
       .then((res) => setData(res));
-  });
 
   return (
     <div>
-      <h1>Hello from React + Vite + Express</h1>
+      <h1>React + Vite + Express</h1>
       <p>
-        Edit <b>App.tsx</b> to see HMR in action!
+        Edit <b>src/App.tsx</b> and save to see HMR in action!
       </p>
       <div>
         <button onClick={() => setCount((count) => count + 1)}>
           Count: {count}
         </button>
       </div>
-      <p>Data from server: {data}</p>
+      <div>
+        <button onClick={() => fetchAPI()}>
+          Fetch data from server: {data}
+        </button>
+      </div>
     </div>
   );
 }
