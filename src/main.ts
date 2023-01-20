@@ -57,6 +57,13 @@ async function serveStatic(app: core.Express) {
       } else next();
     });
   }
+
+  const layer = app._router.stack.pop();
+  app._router.stack = [
+    ...app._router.stack.slice(0, 2),
+    layer,
+    ...app._router.stack.slice(2),
+  ];
 }
 
 async function startDevServer(app: core.Express) {
@@ -91,14 +98,12 @@ function config(config: Partial<typeof Config>) {
   if (config.vitePort) Config.vitePort = config.vitePort;
 }
 
-async function serve(app: core.Express) {
-  await serveStatic(app);
-  if (Config.mode === "development") await startDevServer(app);
-}
-
 async function listen(app: core.Express, port: number, callback?: () => void) {
-  await serve(app);
-  app.listen(port, callback);
+  app.listen(port, async () => {
+    await serveStatic(app);
+    if (Config.mode === "development") await startDevServer(app);
+    callback?.();
+  });
 }
 
 async function build() {
@@ -107,4 +112,4 @@ async function build() {
   info("Build completed!");
 }
 
-export default { build, config, listen, serve, static: serveStatic };
+export default { config, listen, build };
