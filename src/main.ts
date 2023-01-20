@@ -1,5 +1,6 @@
 import express from "express";
 import core from "express-serve-static-core";
+import fs from "fs";
 import fetch from "node-fetch";
 import path from "path";
 import colors from "picocolors";
@@ -35,9 +36,17 @@ async function serveStatic(app: core.Express) {
   info(`Running in ${colors.yellow(Config.mode)} mode`);
   if (Config.mode === "production") {
     const config = await Vite.resolveConfig({}, "build");
-    app.use(
-      express.static(path.resolve(__dirname, config.root, config.build.outDir))
-    );
+    const distPath = path.resolve(config.root, config.build.outDir);
+    app.use(express.static(distPath));
+
+    if (!fs.existsSync(config.build.outDir)) {
+      info(
+        `${colors.yellow(
+          `Static files at ${colors.gray(distPath)} not found!`
+        )}`
+      );
+      await build();
+    }
   } else {
     app.use((req, res, next) => {
       if (isStaticFilePath(req.path)) {
@@ -93,7 +102,7 @@ async function listen(app: core.Express, port: number, callback?: () => void) {
 }
 
 async function build() {
-  info("Building Vite app...");
+  info("Build starting...");
   await Vite.build();
   info("Build completed!");
 }
