@@ -112,6 +112,6 @@ button:focus-visible {
   color: #888;
 }
 
-div > div:last-child{
-    margin-top: 20px;
+div > div:last-child {
+  margin-top: 20px;
 }
