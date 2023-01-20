@@ -21,9 +21,8 @@ export function App() {
         </button>
       </div>
       <div>
-        <button onClick={() => fetchAPI()}>
-          Fetch data from server: {data}
-        </button>
+        <button onClick={() => fetchAPI()}>Fetch data from server</button>
+        <p>{data}</p>
       </div>
     </div>
   );
