@@ -53,5 +53,12 @@
       "yarn lint",
       "yarn format"
     ]
-  }
+  },
+  "keywords": [
+    "express",
+    "vite",
+    "integration",
+    "module",
+    "connector"
+  ]
 }
