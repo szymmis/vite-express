@@ -36,9 +36,31 @@ The only thing that is left to you is **to code**! 🎉
 
 ## 📦 Installation & usage
 
-> You can see more examples [here](examples)
+The easiest way to setup a **Vite Express** app is to use [`create-vite-express` package](https://www.npmjs.com/package/create-vite-express)
 
-The easiest way to setup a basic **Vite Express** app is to use [`create-vite` package](https://vitejs.dev/guide/#scaffolding-your-first-vite-project) to setup the client and then add an express server to it.
+ 1. Run the CLI from your terminal
+
+    ```bash
+    yarn create vite-express
+    ```
+
+ 2. Follow the prompts to configure your project using your favourite framework.
+ 3. Open app folder, install dependencies and run the app in development mode
+
+    ```bash
+    cd YOUR_APP_NAME
+    yarn
+    yarn dev
+    ```
+
+ 4. Open your browser at `http://localhost:3000`
+ 5. Change the client code and see the beauty of [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement) in action!
+
+Congrats, you've just created your first `vite-express` app! 🎉 Happy hacking!
+
+---
+
+Alternatively you can use [`create-vite` package](https://vitejs.dev/guide/#scaffolding-your-first-vite-project) to setup the client and then add an express server to it if your favourite framework isn't supported by `create-vite-express`.
 
  1. Start by creating **Vite** project
 
@@ -79,6 +101,8 @@ The easiest way to setup a basic **Vite Express** app is to use [`create-vite` p
  7. Change the client code and see the beauty of [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement) in action!
 
 Congrats, you've just created your first `vite-express` app! 🎉 Happy hacking!
+
+> You can see more examples [here](examples)
 
 ## 🚚 Shipping to production
 
