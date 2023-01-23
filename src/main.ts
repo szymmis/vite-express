@@ -66,24 +66,10 @@ async function serveStatic(app: core.Express) {
   ];
 }
 
-async function startDevServer(app: core.Express) {
+async function startDevServer() {
   const server = await Vite.createServer({
     clearScreen: false,
     server: { port: Config.vitePort },
-  });
-
-  app.get("/*", async (req, res, next) => {
-    if (isStaticFilePath(req.path)) return next();
-
-    fetch(getViteHost())
-      .then((res) => res.text())
-      .then((content) =>
-        content.replace(
-          /(\/@react-refresh|\/@vite\/client)/g,
-          `${getViteHost()}$1`
-        )
-      )
-      .then((content) => res.header("Content-Type", "text/html").send(content));
   });
 
   await server.listen();
@@ -91,6 +77,33 @@ async function startDevServer(app: core.Express) {
   info(
     `Vite is listening ${colors.gray(`http://localhost:${Config.vitePort}`)}`
   );
+}
+
+async function serveHTML(app: core.Express) {
+  if (Config.mode === "production") {
+    const config = await Vite.resolveConfig({}, "build");
+    const distPath = path.resolve(config.root, config.build.outDir);
+
+    app.use("*", (_, res) => {
+      res.sendFile(path.resolve(distPath, "index.html"));
+    });
+  } else {
+    app.get("/*", async (req, res, next) => {
+      if (isStaticFilePath(req.path)) return next();
+
+      fetch(getViteHost())
+        .then((res) => res.text())
+        .then((content) =>
+          content.replace(
+            /(\/@react-refresh|\/@vite\/client)/g,
+            `${getViteHost()}$1`
+          )
+        )
+        .then((content) =>
+          res.header("Content-Type", "text/html").send(content)
+        );
+    });
+  }
 }
 
 function config(config: Partial<typeof Config>) {
@@ -101,7 +114,8 @@ function config(config: Partial<typeof Config>) {
 async function listen(app: core.Express, port: number, callback?: () => void) {
   app.listen(port, async () => {
     await serveStatic(app);
-    if (Config.mode === "development") await startDevServer(app);
+    await serveHTML(app);
+    if (Config.mode === "development") await startDevServer();
     callback?.();
   });
 }
