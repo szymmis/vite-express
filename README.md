@@ -149,7 +149,7 @@ Because `ViteExpress.listen` is an async function, in most cases it doesn't matt
 | `⚡ vite-express` functions                                                           |
 | ------------------------------------------------------------------------------------ |
 | [`config(options) => void`](#configoptions--void)                                    |
-| [`async listen(app, port, callback?) => void`](#async-listenapp-port-callback--void) |
+| [`listen(app, port, callback?) => http.Server`](#listenapp-port-callback--httpserver) |
 | [`async build() => void`](#async-build--void)                                        |
 
 ---
