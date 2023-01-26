@@ -146,11 +146,11 @@ Because `ViteExpress.listen` is an async function, in most cases it doesn't matt
 
 ## 📝 Documentation
 
-| `⚡ vite-express` functions                                                           |
-| ------------------------------------------------------------------------------------ |
-| [`config(options) => void`](#configoptions--void)                                    |
-| [`async listen(app, port, callback?) => void`](#async-listenapp-port-callback--void) |
-| [`async build() => void`](#async-build--void)                                        |
+| `⚡ vite-express` functions                                                            |
+| ------------------------------------------------------------------------------------- |
+| [`config(options) => void`](#configoptions--void)                                     |
+| [`listen(app, port, callback?) => http.Server`](#listenapp-port-callback--httpserver) |
+| [`async build() => void`](#async-build--void)                                         |
 
 ---
 
@@ -171,7 +171,7 @@ ViteExpress.config({ /*...*/ });
 
 ---
 
-### `async listen(app, port, callback?) => void`
+### `listen(app, port, callback?) => http.Server`
 
 Used to inject necessary middlewares into the app and start listening on defined port. Should replace `app.listen()` in your base express application. Due to its async nature can be invoked at any time but should generally be invoked at the end to avoid interfering with other middlewares and route handlers.
 
@@ -179,9 +179,11 @@ Used to inject necessary middlewares into the app and start listening on defined
 - **`port: number`** - port that server will be listening on
 - **`callback?: () => void`** - function that will be invoked after server starts listening
 
+Returns the same [`http.Server`](https://nodejs.org/api/http.html#class-httpserver) that is returned by express when running [`app.listen()`](https://expressjs.com/en/api.html#app.listen)
+
 ```js
 const app = express();
-ViteExpress.listen(app, 3000, () => console.log("Server is listening!"));
+const httpServer = ViteExpress.listen(app, 3000, () => console.log("Server is listening!"));
 ```
 
 ---
