@@ -146,11 +146,11 @@ Because `ViteExpress.listen` is an async function, in most cases it doesn't matt
 
 ## 📝 Documentation
 
-| `⚡ vite-express` functions                                                           |
-| ------------------------------------------------------------------------------------ |
-| [`config(options) => void`](#configoptions--void)                                    |
+| `⚡ vite-express` functions                                                            |
+| ------------------------------------------------------------------------------------- |
+| [`config(options) => void`](#configoptions--void)                                     |
 | [`listen(app, port, callback?) => http.Server`](#listenapp-port-callback--httpserver) |
-| [`async build() => void`](#async-build--void)                                        |
+| [`async build() => void`](#async-build--void)                                         |
 
 ---
 
@@ -179,7 +179,7 @@ Used to inject necessary middlewares into the app and start listening on defined
 - **`port: number`** - port that server will be listening on
 - **`callback?: () => void`** - function that will be invoked after server starts listening
 
-Returns the `http.Server` that was created by express
+Returns the same [`http.Server`](https://nodejs.org/api/http.html#class-httpserver) that is returned by express when running [`app.listen()`](https://expressjs.com/en/api.html#app.listen)
 
 ```js
 const app = express();
