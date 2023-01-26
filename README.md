@@ -2,8 +2,9 @@
 
 > [@vitejs](https://github.com/vitejs/vite) integration module for [@expressjs](https://github.com/expressjs/express)
 
+[![npm](https://img.shields.io/npm/v/vite-express)](https://www.npmjs.org/package/vite-express)
+[![downloads-per-week](https://img.shields.io/npm/dt/vite-express?color=success)](https://www.npmjs.org/package/vite-express)
 [![bundle-size](https://img.shields.io/bundlephobia/minzip/vite-express)](https://www.npmjs.org/package/vite-express)
-[![downloads-per-week](https://img.shields.io/npm/dt/vite-express?color=red)](https://www.npmjs.org/package/vite-express)
 [![license](https://img.shields.io/npm/l/vite-express?color=purple)](https://www.npmjs.org/package/vite-express)
 
 - [📦 Installation \& usage](#-installation--usage)
