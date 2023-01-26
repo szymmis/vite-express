@@ -111,8 +111,8 @@ function config(config: Partial<typeof Config>) {
   if (config.vitePort) Config.vitePort = config.vitePort;
 }
 
-async function listen(app: core.Express, port: number, callback?: () => void) {
-  app.listen(port, async () => {
+function listen(app: core.Express, port: number, callback?: () => void) {
+  return app.listen(port, async () => {
     await serveStatic(app);
     await serveHTML(app);
     if (Config.mode === "development") await startDevServer();
