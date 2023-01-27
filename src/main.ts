@@ -39,7 +39,7 @@ async function serveStatic(app: core.Express) {
     const distPath = path.resolve(config.root, config.build.outDir);
     app.use(express.static(distPath));
 
-    if (!fs.existsSync(config.build.outDir)) {
+    if (!fs.existsSync(distPath)) {
       info(
         `${colors.yellow(
           `Static files at ${colors.gray(distPath)} not found!`
