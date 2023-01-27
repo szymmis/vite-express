@@ -37,7 +37,7 @@ The only thing that is left to you is **to code**! 🎉
 
 ## 📦 Installation & usage
 
-The easiest way to setup a **Vite Express** app is to use [`create-vite-express` package](https://www.npmjs.com/package/create-vite-express)
+The easiest way to setup a **Vite Express** app is to use [`🏗️ create-vite-express`](https://www.npmjs.com/package/create-vite-express) package
 
  1. Run the CLI from your terminal
 
