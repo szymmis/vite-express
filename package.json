@@ -15,6 +15,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "http-proxy-middleware": "^2.0.6",
     "node-fetch": "^2.0.0"
   },
   "peerDependencies": {

@@ -1,6 +1,7 @@
 import express from "express";
 import core from "express-serve-static-core";
 import fs from "fs";
+import { createProxyMiddleware } from "http-proxy-middleware";
 import fetch from "node-fetch";
 import path from "path";
 import colors from "picocolors";
@@ -29,7 +30,7 @@ function info(msg: string) {
 }
 
 function isStaticFilePath(path: string) {
-  return path.match(/\.\w+$/);
+  return path.match(/\.\w+$/) || path.match(/^\/@/);
 }
 
 async function serveStatic(app: core.Express) {
@@ -48,13 +49,10 @@ async function serveStatic(app: core.Express) {
       await build();
     }
   } else {
+    const proxy = createProxyMiddleware({ target: getViteHost(), ws: true });
     app.use((req, res, next) => {
-      if (isStaticFilePath(req.path)) {
-        fetch(`${getViteHost()}${req.path}`).then((response) => {
-          if (!response.ok) return next();
-          res.redirect(response.url);
-        });
-      } else next();
+      if (!isStaticFilePath(req.path)) return next();
+      proxy(req, res, next);
     });
   }
 
