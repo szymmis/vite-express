@@ -1,0 +1,32 @@
+{
+  "name": "create-vite-express",
+  "version": "0.0.4",
+  "main": "index.js",
+  "author": "Szymon Miśtal <mistalzaq@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "ts-node src/cli.ts",
+    "build": "rollup -c --bundleConfigAsCjs"
+  },
+  "dependencies": {
+    "fs-extra": "^11.1.0",
+    "kolorist": "^1.6.0",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/fs-extra": "^11.0.1",
+    "@types/node": "^18.11.18",
+    "@types/prompts": "^2.4.2",
+    "nodemon": "^2.0.20",
+    "rollup-plugin-add-shebang": "^0.3.1",
+    "rollup": "^3.10.1",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.4"
+  },
+  "bin": "bin/cli.js",
+  "files": [
+    "bin",
+    "templates"
+  ]
+}

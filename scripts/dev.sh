@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 npm link
-cd examples/"${1:-basic-app}"
+cd create-vite-express/templates/"${1:-react}"
 npm link vite-express
-yarn dev -w ../../dist
+yarn dev -w ../../../dist

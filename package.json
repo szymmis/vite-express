@@ -10,9 +10,11 @@
   "scripts": {
     "dev": "concurrently -i -P \"sh scripts/dev.sh {1}\" \"yarn build --watch\" --",
     "build": "rollup --config rollup.config.js --bundleConfigAsCjs",
-    "format": "prettier . --write --loglevel silent",
-    "lint": "eslint src --fix",
-    "prepare": "husky install"
+    "format": "prettier --write --loglevel silent",
+    "lint": "eslint --fix",
+    "type-check": "tsc --noEmit; tsc --noEmit -p create-vite-express/tsconfig.json",
+    "prepare": "husky install",
+    "postinstall": "cd create-vite-express && yarn install"
   },
   "dependencies": {
     "node-fetch": "^2.0.0"
@@ -49,7 +51,8 @@
     "./dist"
   ],
   "lint-staged": {
-    "(src|examples)/*": [
+    "**/*.{json}": "yarn format",
+    "**/*.{js,jsx,ts,tsx}": [
       "yarn lint",
       "yarn format"
     ]
