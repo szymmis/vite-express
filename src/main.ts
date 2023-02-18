@@ -70,13 +70,11 @@ async function startDevServer() {
   const server = await Vite.createServer({
     clearScreen: false,
     server: { port: Config.vitePort },
-  });
+  }).then((server) => server.listen());
 
-  await server.listen();
+  info(`Vite is listening ${colors.gray(getViteHost())}`);
 
-  info(
-    `Vite is listening ${colors.gray(`http://localhost:${Config.vitePort}`)}`
-  );
+  return server;
 }
 
 async function serveHTML(app: core.Express) {
@@ -112,12 +110,18 @@ function config(config: Partial<typeof Config>) {
 }
 
 function listen(app: core.Express, port: number, callback?: () => void) {
-  return app.listen(port, async () => {
+  let devServer: Vite.ViteDevServer | undefined;
+
+  const server = app.listen(port, async () => {
+    if (Config.mode === "development") devServer = await startDevServer();
     await serveStatic(app);
     await serveHTML(app);
-    if (Config.mode === "development") await startDevServer();
     callback?.();
   });
+
+  server.on("close", () => devServer?.close());
+
+  return server;
 }
 
 async function build() {
