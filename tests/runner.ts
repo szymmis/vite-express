@@ -1,6 +1,7 @@
-import colors from "picocolors";
+import { spawn } from "child_process";
+import pc from "picocolors";
 
-import { getExecutionTimeSeconds, log } from "./utils";
+import { getExecutionTimeSeconds, log, wait } from "./utils";
 
 type Test = {
   name: string;
@@ -27,20 +28,58 @@ export function expect<T>(value: T) {
     toBe: (expected: T) => {
       if (value !== expected)
         throw new TestError(
-          `Given value is not equal to the expected one\n\tgiven: ${colors.red(
+          `Given value is not equal to the expected one\n\tgiven: ${pc.red(
             JSON.stringify(value)
-          )}\n\texpected: ${colors.green(JSON.stringify(expected))}`
+          )}\n\texpected: ${pc.green(JSON.stringify(expected))}`
         );
     },
     toMatch: (regex: RegExp) => {
       if (!regex.test(String(value)))
         throw new TestError(
-          `Given value does not match regex\n\tgiven: ${colors.red(
+          `Given value does not match regex\n\tgiven: ${pc.red(
             String(value).trim()
-          )}\n\texpected to match: ${colors.green(String(regex))}`
+          )}\n\texpected to match: ${pc.green(String(regex))}`
         );
     },
   };
+}
+
+export async function expectCommandOutput(
+  cmd: string,
+  matchOutputRegex?: RegExp,
+  debug = false
+) {
+  const [command, ...args] = cmd.split(" ");
+
+  const child = spawn(command, args, { detached: true });
+
+  await new Promise<void>((resolve, reject) => {
+    child.stdout?.on("data", (msg) => {
+      if (debug) process.stdout.write(msg);
+      if (matchOutputRegex?.test(msg)) {
+        if (child.pid) process.kill(-child.pid);
+        resolve();
+      }
+    });
+
+    child.stderr?.on("data", (msg) => {
+      if (debug) process.stdout.write(msg);
+      reject(
+        `Process failed with error:\n${String(msg)
+          .trim()
+          .split("\n")
+          .map((line) => `\t${pc.red(line)}`)}`
+      );
+    });
+
+    child.on("close", () => {
+      if (matchOutputRegex) {
+        reject("Process closed without expected output");
+      } else resolve();
+    });
+  });
+
+  await wait(100);
 }
 
 let time: [number, number];
@@ -60,7 +99,7 @@ export async function run() {
           new Promise<void>((resolve, reject) => test.fn(resolve).catch(reject))
       );
       passedTestCount++;
-      log.pass(`Done in ${colors.gray(`${time}s`)}`);
+      log.pass(`Done in ${pc.gray(`${time}s`)}`);
     } catch (e) {
       if (e instanceof TestError) {
         log.fail(e.message);
