@@ -46,7 +46,7 @@ export function expect<T>(value: T) {
 
 export async function expectCommandOutput(
   cmd: string,
-  matchOutputRegex?: RegExp,
+  matchOutputRegex?: RegExp[],
   debug = process.env.DEBUG ?? false
 ) {
   const [command, ...args] = cmd.split(" ");
@@ -56,7 +56,7 @@ export async function expectCommandOutput(
   await new Promise<void>((resolve, reject) => {
     child.stdout?.on("data", (msg) => {
       if (debug) process.stdout.write(msg);
-      if (matchOutputRegex?.test(msg)) {
+      if (matchOutputRegex?.every((regex) => regex.test(msg))) {
         if (child.pid) process.kill(-child.pid);
         resolve();
       }

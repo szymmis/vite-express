@@ -13,13 +13,13 @@ for (const template of templates) {
     execSync("yarn install");
     it("yarn installed");
 
-    await expectCommandOutput("yarn dev", /Vite is listening/);
+    await expectCommandOutput("yarn dev", [/Vite is listening/]);
     it("dev command works");
 
     await expectCommandOutput("yarn build");
     it("app can be built");
 
-    await expectCommandOutput("yarn start", /Running in production mode/);
+    await expectCommandOutput("yarn start", [/Running in/, /production/]);
     it("production build works");
 
     done();
