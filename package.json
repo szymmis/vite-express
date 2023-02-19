@@ -41,6 +41,7 @@
     "nodemon": "^2.0.20",
     "picocolors": "^1.0.0",
     "prettier": "^2.8.3",
+    "puppeteer": "^19.6.2",
     "rollup": "^3.7.3",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.1",
