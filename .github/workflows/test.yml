@@ -2,7 +2,7 @@ name: Test the package
 on: push
 jobs:
   test:
-    name: Run the tests
+    name: Run tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -10,4 +10,4 @@ jobs:
         with:
           node-version: 16
       - run: yarn install
-      - run: yarn test
+      - run: DEBUG=true yarn test

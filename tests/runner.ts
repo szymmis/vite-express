@@ -47,7 +47,7 @@ export function expect<T>(value: T) {
 export async function expectCommandOutput(
   cmd: string,
   matchOutputRegex?: RegExp,
-  debug = false
+  debug = process.env.DEBUG ?? false
 ) {
   const [command, ...args] = cmd.split(" ");
 
