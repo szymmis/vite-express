@@ -4,16 +4,22 @@ import { ElementHandle, Page } from "puppeteer";
 
 export const log = {
   test: (msg: string) => {
-    process.stdout.write(`${colors.bgYellow(colors.bold(" TEST "))} ${msg}\n`);
+    process.stdout.write(
+      `${colors.bgYellow(colors.black(colors.bold(" TEST ")))} ${msg}\n`
+    );
   },
   it: (msg: string) => {
     process.stdout.write(`\t${colors.green("✓")} ${msg}\n`);
   },
   fail: (msg: string) => {
-    process.stdout.write(`${colors.bgRed(colors.bold(" FAIL "))} ${msg}\n`);
+    process.stdout.write(
+      `${colors.bgRed(colors.black(colors.bold(" FAIL ")))} ${msg}\n`
+    );
   },
   pass: (msg: string) => {
-    process.stdout.write(`${colors.bgGreen(colors.bold(" PASS "))} ${msg}\n`);
+    process.stdout.write(
+      `${colors.bgGreen(colors.black(colors.bold(" PASS ")))} ${msg}\n`
+    );
   },
   summary: (
     hrtime: [number, number],
