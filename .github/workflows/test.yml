@@ -1,5 +1,8 @@
 name: Test the package
-on: push
+on: 
+  push:
+    branches-ignore:
+      - 'master'
 env:
   VERBOSE_TESTS: true
 jobs:
