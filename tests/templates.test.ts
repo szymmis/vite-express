@@ -44,6 +44,8 @@ for (const template of templates) {
           "<title>Test - $1</title>"
         );
 
+        await wait(100);
+
         let button = await getButton(page);
         await button?.click();
         expect(await getButtonText(button)).toBe("count is 1");
@@ -54,7 +56,7 @@ for (const template of templates) {
           "<title>$1</title>"
         );
 
-        await wait(1000);
+        await wait(100);
 
         button = await getButton(page);
         expect(await getButtonText(button)).toBe("count is 0");
