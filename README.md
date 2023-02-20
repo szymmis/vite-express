@@ -37,6 +37,8 @@ The only thing that is left to you is **to code**! 🎉
 
 ## 📦 Installation & usage
 
+### Fresh setup with `🏗️ create-vite-express`
+
 The easiest way to setup a **Vite Express** app is to use [`🏗️ create-vite-express`](https://www.npmjs.com/package/create-vite-express) package
 
  1. Run the CLI from your terminal
@@ -59,7 +61,7 @@ The easiest way to setup a **Vite Express** app is to use [`🏗️ create-vite-
 
 Congrats, you've just created your first `vite-express` app! 🎉 Happy hacking!
 
----
+### Fresh setup with `create-vite`
 
 Alternatively you can use [`create-vite` package](https://vitejs.dev/guide/#scaffolding-your-first-vite-project) to setup the client and then add an express server to it if your favourite framework isn't supported by `create-vite-express`.
 
@@ -103,13 +105,11 @@ Alternatively you can use [`create-vite` package](https://vitejs.dev/guide/#scaf
 
 Congrats, you've just created your first `vite-express` app! 🎉 Happy hacking!
 
-> You can see more examples [here](examples)
-
 ## 🚚 Shipping to production
 
-By default vite-express is in **development** mode, when server acts as a simple proxy between client and Vite's Dev Server utilizing the power of HMR and native browser modules. This is not suitable for production as described [here](https://vitejs.dev/guide/why.html#why-bundle-for-production), so in production we want to serve static files that Vite spits out during it's build process. That's why you need to invoke [`vite build`](https://vitejs.dev/guide/cli.html#build) command first. Then you need to run your app in production mode.
+By default vite-express runs in **development** mode, when server acts as a simple proxy between client and Vite's Dev Server utilizing the power of HMR and native browser modules. This is not suitable for production as described [here](https://vitejs.dev/guide/why.html#why-bundle-for-production), so in production we want to serve static files that Vite spits out during it's build process. That's why you need to invoke [`vite build`](https://vitejs.dev/guide/cli.html#build) command first. Then you need to run your app in production mode.
 
-You have these options to do this
+You have these options to achieve that
 
 - Run the code with `NODE_ENV=production` variable, either by inlining it with the command
 
@@ -119,7 +119,7 @@ You have these options to do this
 
    Or by using [`dotenv`](https://www.npmjs.com/package/dotenv) or other envs tool.
 
-- Use `ViteExpress.config()` having `mode` set as `production`
+- Use `ViteExpress.config()` and set `mode` to `production`
 
     ```javascript
    import express from "express";
