@@ -1,5 +1,5 @@
 *.tgz
 bin
 dist
-examples/**/yarn.lock
+**/templates/**/yarn.lock
 node_modules

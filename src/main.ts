@@ -3,7 +3,7 @@ import core from "express-serve-static-core";
 import fs from "fs";
 import fetch from "node-fetch";
 import path from "path";
-import colors from "picocolors";
+import pc from "picocolors";
 import Vite from "vite";
 
 const { NODE_ENV } = process.env;
@@ -22,9 +22,9 @@ function getViteHost() {
 function info(msg: string) {
   const timestamp = new Date().toLocaleString("en-US").split(",")[1].trim();
   console.log(
-    `${colors.dim(timestamp)} ${colors.bold(
-      colors.cyan("[vite-express]")
-    )} ${colors.green(msg)}`
+    `${pc.dim(timestamp)} ${pc.bold(pc.cyan("[vite-express]"))} ${pc.green(
+      msg
+    )}`
   );
 }
 
@@ -33,18 +33,14 @@ function isStaticFilePath(path: string) {
 }
 
 async function serveStatic(app: core.Express) {
-  info(`Running in ${colors.yellow(Config.mode)} mode`);
+  info(`Running in ${pc.yellow(Config.mode)} mode`);
   if (Config.mode === "production") {
     const config = await Vite.resolveConfig({}, "build");
     const distPath = path.resolve(config.root, config.build.outDir);
     app.use(express.static(distPath));
 
     if (!fs.existsSync(distPath)) {
-      info(
-        `${colors.yellow(
-          `Static files at ${colors.gray(distPath)} not found!`
-        )}`
-      );
+      info(`${pc.yellow(`Static files at ${pc.gray(distPath)} not found!`)}`);
       await build();
     }
   } else {
@@ -70,13 +66,11 @@ async function startDevServer() {
   const server = await Vite.createServer({
     clearScreen: false,
     server: { port: Config.vitePort },
-  });
+  }).then((server) => server.listen());
 
-  await server.listen();
+  info(`Vite is listening ${pc.gray(getViteHost())}`);
 
-  info(
-    `Vite is listening ${colors.gray(`http://localhost:${Config.vitePort}`)}`
-  );
+  return server;
 }
 
 async function serveHTML(app: core.Express) {
@@ -112,12 +106,18 @@ function config(config: Partial<typeof Config>) {
 }
 
 function listen(app: core.Express, port: number, callback?: () => void) {
-  return app.listen(port, async () => {
+  let devServer: Vite.ViteDevServer | undefined;
+
+  const server = app.listen(port, async () => {
+    if (Config.mode === "development") devServer = await startDevServer();
     await serveStatic(app);
     await serveHTML(app);
-    if (Config.mode === "development") await startDevServer();
     callback?.();
   });
+
+  server.on("close", () => devServer?.close());
+
+  return server;
 }
 
 async function build() {
