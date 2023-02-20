@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
 import pc from "picocolors";
 
-import { getExecutionTimeSeconds, log, wait } from "./utils";
+import { getExecutionTimeSeconds, isOutputVerbose, log, wait } from "./utils";
 
 type Test = {
   name: string;
@@ -47,7 +47,7 @@ export function expect<T>(value: T) {
 export async function expectCommandOutput(
   cmd: string,
   matchOutputRegex?: RegExp[],
-  debug = process.env.DEBUG ?? false
+  debug = isOutputVerbose()
 ) {
   const [command, ...args] = cmd.split(" ");
 
@@ -129,5 +129,5 @@ function printSummary() {
 }
 
 function silenceConsole() {
-  console.log = () => 1;
+  if (!isOutputVerbose()) console.log = () => 1;
 }

@@ -1,11 +1,16 @@
-import { execSync } from "child_process";
 import express from "express";
 import fs from "fs";
 import puppeteer from "puppeteer";
 
 import ViteExpress from "../src/main";
 import { expect, it, test } from "./runner";
-import { getButton, getButtonText, replaceStringInFile, wait } from "./utils";
+import {
+  getButton,
+  getButtonText,
+  installYarn,
+  replaceStringInFile,
+  wait,
+} from "./utils";
 
 const baseDir = process.cwd();
 const templates = fs.readdirSync("create-vite-express/templates");
@@ -20,8 +25,8 @@ const templatesHotReloadTestFileMap: Record<string, string> = {
 for (const template of templates) {
   test(`Template "${template}"`, async (done) => {
     process.chdir(`create-vite-express/templates/${template}`);
-    execSync("yarn install");
 
+    installYarn();
     it("yarn installed");
 
     const server = ViteExpress.listen(express(), 3000, () => {
@@ -49,7 +54,7 @@ for (const template of templates) {
           "<title>$1</title>"
         );
 
-        await wait(500);
+        await wait(1000);
 
         button = await getButton(page);
         expect(await getButtonText(button)).toBe("count is 0");

@@ -1,3 +1,4 @@
+import { execSync } from "child_process";
 import fs from "fs";
 import colors from "picocolors";
 import { ElementHandle, Page } from "puppeteer";
@@ -81,4 +82,12 @@ export async function getButtonText(
   button: ElementHandle<HTMLButtonElement> | null
 ) {
   return await button?.evaluate((p) => p.innerText);
+}
+
+export function installYarn() {
+  execSync("yarn install", { stdio: isOutputVerbose() ? "inherit" : "ignore" });
+}
+
+export function isOutputVerbose() {
+  return process.env.VERBOSE_TESTS === "true";
 }

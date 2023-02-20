@@ -1,5 +1,7 @@
 name: Test the package
 on: push
+env:
+  VERBOSE_TESTS: true
 jobs:
   test:
     name: Run tests
@@ -10,4 +12,5 @@ jobs:
         with:
           node-version: 16
       - run: yarn install
-      - run: DEBUG=true yarn test
+      - run: yarn test
+      
