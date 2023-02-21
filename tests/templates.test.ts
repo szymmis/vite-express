@@ -26,7 +26,7 @@ for (const template of templates) {
   test(`Template "${template}"`, async (done) => {
     process.chdir(`create-vite-express/templates/${template}`);
 
-    installYarn();
+    await installYarn();
     it("yarn installed");
 
     const server = ViteExpress.listen(express(), 3000, () => {

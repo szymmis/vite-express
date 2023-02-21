@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
 import pc from "picocolors";
 
-import { getExecutionTimeSeconds, isOutputVerbose, log, wait } from "./utils";
+import { getExecutionTimeSeconds, log, wait } from "./utils";
 
 type Test = {
   name: string;
@@ -46,8 +46,7 @@ export function expect<T>(value: T) {
 
 export async function expectCommandOutput(
   cmd: string,
-  matchOutputRegex?: RegExp[],
-  debug = isOutputVerbose()
+  matchOutputRegex?: RegExp[]
 ) {
   const [command, ...args] = cmd.split(" ");
 
@@ -55,7 +54,7 @@ export async function expectCommandOutput(
 
   await new Promise<void>((resolve, reject) => {
     child.stdout?.on("data", (msg) => {
-      if (debug) process.stdout.write(msg);
+      process.stdout.write(msg);
       if (matchOutputRegex?.every((regex) => regex.test(msg))) {
         if (child.pid) process.kill(-child.pid);
         resolve();
@@ -63,7 +62,7 @@ export async function expectCommandOutput(
     });
 
     child.stderr?.on("data", (msg) => {
-      if (debug) process.stdout.write(msg);
+      process.stdout.write(msg);
       reject(
         `Process failed with error:\n${String(msg)
           .trim()
@@ -87,8 +86,6 @@ let passedTestCount = 0;
 const tests: Test[] = [];
 
 export async function run() {
-  silenceConsole();
-
   time = process.hrtime();
 
   for (const test of tests) {
@@ -126,8 +123,4 @@ function printSummary() {
     tests.length - passedTestCount,
     tests.length
   );
-}
-
-function silenceConsole() {
-  if (!isOutputVerbose()) console.log = () => 1;
 }

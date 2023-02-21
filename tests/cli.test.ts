@@ -1,4 +1,3 @@
-import { execSync } from "child_process";
 import fs from "fs";
 
 import { expectCommandOutput, it, test } from "./runner";
@@ -11,7 +10,7 @@ for (const template of templates) {
   test(`[CLI] Template "${template}"`, async (done) => {
     process.chdir(`create-vite-express/templates/${template}`);
 
-    installYarn();
+    await installYarn();
     it("yarn installed");
 
     await expectCommandOutput("yarn dev", [/Vite is listening/]);
@@ -23,7 +22,7 @@ for (const template of templates) {
     await expectCommandOutput("yarn start", [/Running in/, /production/]);
     it("production build works");
 
-    done();
     process.chdir(baseDir);
+    done();
   });
 }
