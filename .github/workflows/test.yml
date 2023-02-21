@@ -3,8 +3,6 @@ on:
   push:
     branches-ignore:
       - 'master'
-env:
-  VERBOSE_TESTS: true
 jobs:
   test:
     name: Run tests
