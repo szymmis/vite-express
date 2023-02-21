@@ -1,6 +1,6 @@
 {
   "name": "vite-express",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "author": "szymmis",
@@ -15,8 +15,7 @@
     "format": "prettier --write --loglevel silent",
     "lint": "eslint --fix",
     "type-check": "tsc --noEmit; tsc --noEmit -p create-vite-express/tsconfig.json",
-    "prepare": "husky install",
-    "postinstall": "cd create-vite-express && yarn install"
+    "prepare": "husky install"
   },
   "dependencies": {
     "node-fetch": "^2.0.0"
