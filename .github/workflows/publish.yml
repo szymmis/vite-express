@@ -3,11 +3,9 @@ on:
   push:
     tags:
       - v*
-env:
-  VERBOSE_TESTS: true
 jobs:
   test:
-    name: Run tests
+    name: Run tests on local build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -15,7 +13,7 @@ jobs:
         with:
           node-version: 16
       - run: yarn install
-      - run: yarn test
+      - run: yarn test:local
   publish:
     name: Publish package
     runs-on: ubuntu-latest

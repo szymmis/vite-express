@@ -3,11 +3,9 @@ on:
   push:
     tags:
       - cli-v*
-env:
-  VERBOSE_TESTS: true
 jobs:
   test:
-    name: Run tests
+    name: Run tests on npm build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

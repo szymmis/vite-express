@@ -3,11 +3,9 @@ on:
   push:
     branches-ignore:
       - 'master'
-env:
-  VERBOSE_TESTS: true
 jobs:
-  test:
-    name: Run tests
+  test-npm:
+    name: Run tests on npm build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,4 +14,14 @@ jobs:
           node-version: 16
       - run: yarn install
       - run: yarn test
+  test-local:
+    name: Run tests on local build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: yarn install
+      - run: yarn test:local
       

@@ -11,11 +11,11 @@
     "dev": "concurrently -i -P \"sh scripts/dev.sh {1}\" \"yarn build --watch\" --",
     "build": "rollup --config rollup.config.js --bundleConfigAsCjs",
     "test": "ts-node tests/index.test.ts",
-    "test:dev": "nodemon tests/index.test.ts",
+    "test:local": "LOCAL_BUILD_TEST=true ts-node tests/index.test.ts",
     "format": "prettier --write --loglevel silent",
     "lint": "eslint --fix",
     "type-check": "tsc --noEmit; tsc --noEmit -p create-vite-express/tsconfig.json",
-    "prepare": "husky install"
+    "prepare": "husky install && cd create-vite-express && yarn install"
   },
   "dependencies": {
     "node-fetch": "^2.0.0"
@@ -44,6 +44,7 @@
     "picocolors": "^1.0.0",
     "prettier": "^2.8.3",
     "puppeteer": "^19.6.2",
+    "rimraf": "^4.1.2",
     "rollup": "^3.7.3",
     "supertest": "^6.3.3",
     "ts-node": "^10.9.1",

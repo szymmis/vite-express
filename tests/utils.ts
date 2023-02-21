@@ -2,6 +2,7 @@ import { execSync } from "child_process";
 import fs from "fs";
 import colors from "picocolors";
 import { ElementHandle, Page } from "puppeteer";
+import rimraf from "rimraf";
 
 export const log = {
   test: (msg: string) => {
@@ -84,10 +85,22 @@ export async function getButtonText(
   return await button?.evaluate((p) => p.innerText);
 }
 
-export function installYarn() {
-  execSync("yarn install", { stdio: isOutputVerbose() ? "inherit" : "ignore" });
+async function removeNodeModules() {
+  await rimraf("node_modules");
+  await rimraf("yarn.lock");
 }
 
-export function isOutputVerbose() {
-  return process.env.VERBOSE_TESTS === "true";
+export async function installYarn() {
+  await removeNodeModules();
+  execSync("yarn install", { stdio: "inherit" });
+
+  if (isLocalBuild()) {
+    execSync("npm install --no-save ../../../vite-express-*.tgz", {
+      stdio: "inherit",
+    });
+  }
+}
+
+export function isLocalBuild() {
+  return process.env.LOCAL_BUILD_TEST === "true";
 }
