@@ -147,11 +147,12 @@ Because `ViteExpress.listen` is an async function, in most cases it doesn't matt
 
 ## 📝 Documentation
 
-| `⚡ vite-express` functions                                                            |
-| ------------------------------------------------------------------------------------- |
-| [`config(options) => void`](#configoptions--void)                                     |
-| [`listen(app, port, callback?) => http.Server`](#listenapp-port-callback--httpserver) |
-| [`async build() => void`](#async-build--void)                                         |
+| `⚡ vite-express` functions                                                                           |
+| ---------------------------------------------------------------------------------------------------- |
+| [`config(options) => void`](#configoptions--void)                                                    |
+| [`listen(app, port, callback?) => http.Server`](#listenapp-port-callback--httpserver)                |
+| [`async bind(app, server, callback?) => Promise<void>`](#async-bindapp-server-callback--promisevoid) |
+| [`async build() => Promise<void>`](#async-build--promisevoid)                                        |
 
 ---
 
@@ -170,8 +171,6 @@ ViteExpress.config({ /*...*/ });
 | mode     | When set to development Vite Dev Server will be utilized, in production app will serve static files built with `vite build` command | `development` | `development`, `production` |
 | vitePort | Port that Vite Dev Server will be listening on                                                                                      | `5173`        | any number                  |
 
----
-
 ### `listen(app, port, callback?) => http.Server`
 
 Used to inject necessary middlewares into the app and start listening on defined port. Should replace `app.listen()` in your base express application. Due to its async nature can be invoked at any time but should generally be invoked at the end to avoid interfering with other middlewares and route handlers.
@@ -187,9 +186,23 @@ const app = express();
 const httpServer = ViteExpress.listen(app, 3000, () => console.log("Server is listening!"));
 ```
 
----
+### `async bind(app, server, callback?) => Promise<void>`
 
-### `async build() => void`
+Used to inject necessary middleware into the app, but does not start the listening process. Should be used when you want to create your own `http`/`https` server instance manually e.g. when you use `socket.io` library. Same as `listen`, can be invoked at any time because it is async, but it is advised to invoke it when you already registered all routes and middlewares, so that it can correctly hook into the express app.
+
+- **`app`** - [express application](https://expressjs.com/en/4x/api.html#express) returned from invoking `express()`
+- **`server: http.Server | https.Server`** - server instance that is returned when invoking [`http.createServer`](https://nodejs.org/api/http.html#class-httpserver)
+- **`callback?: () => void`** - function that will be invoked after Vite dev server is started and vite-express injects all middleware
+
+```js
+const app = express();
+const server = http.createServer(app).listen(3000, () => { 
+   console.log("Server is listening!")
+});
+ViteExpress.bind(app, server);
+```
+
+### `async build() => Promise<void>`
 
 Used when you want to build the app to production programically. It is adviced to use `vite build` command, but can be freely used in some edge scenarios (e.g. in some automation scripts) as it does the same thing.
 
