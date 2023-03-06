@@ -1,6 +1,8 @@
 import express from "express";
 import core from "express-serve-static-core";
 import fs from "fs";
+import http from "http";
+import https from "https";
 import fetch from "node-fetch";
 import path from "path";
 import pc from "picocolors";
@@ -105,18 +107,23 @@ function config(config: Partial<typeof Config>) {
   if (config.vitePort) Config.vitePort = config.vitePort;
 }
 
+async function bind(
+  app: core.Express,
+  server: http.Server | https.Server,
+  callback?: () => void
+) {
+  if (Config.mode === "development") {
+    const devServer = await startDevServer();
+    server.on("close", () => devServer?.close());
+  }
+
+  await serveStatic(app);
+  await serveHTML(app);
+  callback?.();
+}
+
 function listen(app: core.Express, port: number, callback?: () => void) {
-  let devServer: Vite.ViteDevServer | undefined;
-
-  const server = app.listen(port, async () => {
-    if (Config.mode === "development") devServer = await startDevServer();
-    await serveStatic(app);
-    await serveHTML(app);
-    callback?.();
-  });
-
-  server.on("close", () => devServer?.close());
-
+  const server = app.listen(port, () => bind(app, server, callback));
   return server;
 }
 
@@ -126,4 +133,4 @@ async function build() {
   info("Build completed!");
 }
 
-export default { config, listen, build };
+export default { config, bind, listen, build };
