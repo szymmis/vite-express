@@ -137,7 +137,7 @@ You have these options to achieve that
 
 The way `vite-express` works is quite simple. As soon as you invoke `ViteExpress.listen`:
 
-- Static files serving middleware is injected at the beginning of express middlewares stack. We do this to ensure that nothing will block your server from sending files like `.js`, `.css` etc. You can thing about this middleware as the same as [`express.static`](https://expressjs.com/en/starter/static-files.html) but for files served by Vite. In production files are not served from Vite but instead from dist folder using said `express.static` middleware
+- Static files serving middleware is injected at the beginning of express middlewares stack. We do this to ensure that nothing will block your server from sending files like `.js`, `.css` etc. You can think about this middleware as the same as [`express.static`](https://expressjs.com/en/starter/static-files.html) but for files served by Vite. In production files are not served from Vite but instead from dist folder using said `express.static` middleware
 
 - A GET routes handler `get("*")` is registered at the end of middleware stack to handle all the routes that were unhandled by you. We do this to ensure that client-side routing is possible.
 
