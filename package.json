@@ -30,6 +30,8 @@
     "@types/express": "^4.17.14",
     "@types/node": "^18.11.12",
     "@types/node-fetch": "^2.6.2",
+    "@types/socket.io": "^3.0.2",
+    "@types/socket.io-client": "^3.0.0",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
@@ -46,6 +48,8 @@
     "puppeteer": "^19.6.2",
     "rimraf": "^4.1.2",
     "rollup": "^3.7.3",
+    "socket.io": "^4.6.1",
+    "socket.io-client": "^4.6.1",
     "supertest": "^6.3.3",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.1",
@@ -56,7 +60,7 @@
     "./dist"
   ],
   "lint-staged": {
-    "**/*.{json}": "yarn format",
+    "**/*.json": "yarn format",
     "**/*.{js,jsx,ts,tsx}": [
       "yarn lint",
       "yarn format"

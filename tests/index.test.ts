@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 
-import { run } from "./runner";
-import { isLocalBuild } from "./utils";
+import { run } from "./lib/runner";
+import { isLocalBuild } from "./lib/utils";
 
 if (isLocalBuild()) {
   execSync("rm -f vite-express-*.tgz && yarn build && yarn pack", {
