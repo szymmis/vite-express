@@ -3,14 +3,14 @@ import fs from "fs";
 import puppeteer from "puppeteer";
 
 import ViteExpress from "../src/main";
-import { expect, it, test } from "./runner";
+import { expect, it, test } from "./lib/runner";
 import {
   getButton,
   getButtonText,
   installYarn,
   replaceStringInFile,
   wait,
-} from "./utils";
+} from "./lib/utils";
 
 const baseDir = process.cwd();
 const templates = fs.readdirSync("create-vite-express/templates");

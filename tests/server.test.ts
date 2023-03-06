@@ -1,13 +1,14 @@
 import express from "express";
+import path from "path";
 import request from "supertest";
 
 import ViteExpress from "../src/main";
-import { expect, it, test } from "./runner";
+import { expect, it, test } from "./lib/runner";
 
 const baseDir = process.cwd();
 
 test("Express app", async (done) => {
-  process.chdir(__dirname);
+  process.chdir(path.join(__dirname, "env"));
 
   const app = express();
 

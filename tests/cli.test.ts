@@ -1,7 +1,7 @@
 import fs from "fs";
 
-import { expectCommandOutput, it, test } from "./runner";
-import { installYarn } from "./utils";
+import { expectCommandOutput, it, test } from "./lib/runner";
+import { installYarn } from "./lib/utils";
 
 const baseDir = process.cwd();
 const templates = fs.readdirSync("create-vite-express/templates");

@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
 import pc from "picocolors";
 
-import { getExecutionTimeSeconds, log, wait } from "./utils";
+import { getExecutionTimeSeconds, log, wait } from "../lib/utils";
 
 type Test = {
   name: string;
