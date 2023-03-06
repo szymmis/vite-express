@@ -56,7 +56,7 @@
     "./dist"
   ],
   "lint-staged": {
-    "**/*.{json}": "yarn format",
+    "**/*.json": "yarn format",
     "**/*.{js,jsx,ts,tsx}": [
       "yarn lint",
       "yarn format"
