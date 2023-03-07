@@ -15,7 +15,9 @@
     "format": "prettier --write --loglevel silent",
     "lint": "eslint --fix",
     "type-check": "tsc --noEmit; tsc --noEmit -p create-vite-express/tsconfig.json",
-    "prepare": "husky install && cd create-vite-express && yarn install"
+    "prepare": "husky install && cd create-vite-express && yarn install",
+    "publish:core": "bash scripts/publish.sh",
+    "publish:cli": "bash scripts/publish-cli.sh"
   },
   "dependencies": {
     "node-fetch": "^2.0.0"
