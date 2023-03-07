@@ -70,6 +70,9 @@ async function startDevServer() {
     server: { port: Config.vitePort },
   }).then((server) => server.listen());
 
+  const vitePort = server.config.server.port;
+  if (vitePort && vitePort !== Config.vitePort) Config.vitePort = vitePort;
+
   info(`Vite is listening ${pc.gray(getViteHost())}`);
 
   return server;
