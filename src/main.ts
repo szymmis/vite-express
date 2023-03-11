@@ -45,6 +45,8 @@ async function serveStatic(app: core.Express) {
       info(`${pc.yellow(`Static files at ${pc.gray(distPath)} not found!`)}`);
       await build();
     }
+
+    info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
   } else {
     app.use((req, res, next) => {
       if (isStaticFilePath(req.path)) {
