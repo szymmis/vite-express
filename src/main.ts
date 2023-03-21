@@ -19,7 +19,7 @@ const Config = {
 };
 
 function getViteHost() {
-  return `http${Config.viteServerSecure ? "s" : ""}://localhost:${
+  return `${Config.viteServerSecure ? "https" : "http"}://localhost:${
     Config.vitePort
   }`;
 }
