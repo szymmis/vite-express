@@ -15,10 +15,13 @@ const Config = {
     | "production"
     | "development",
   vitePort: 5173,
+  viteServerSecure: false,
 };
 
 function getViteHost() {
-  return `http://localhost:${Config.vitePort}`;
+  return `${Config.viteServerSecure ? "https" : "http"}://localhost:${
+    Config.vitePort
+  }`;
 }
 
 function info(msg: string) {
@@ -74,6 +77,8 @@ async function startDevServer() {
 
   const vitePort = server.config.server.port;
   if (vitePort && vitePort !== Config.vitePort) Config.vitePort = vitePort;
+
+  Config.viteServerSecure = Boolean(server.config.server.https);
 
   info(`Vite is listening ${pc.gray(getViteHost())}`);
 
