@@ -24,7 +24,8 @@
   },
   "peerDependencies": {
     "express": "^4.18.2",
-    "vite": "^4.0.0"
+    "vite": "^4.0.0",
+    "picocolors": "^1.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.2.0",
