@@ -16,7 +16,9 @@ const Config = {
     | "development",
   vitePort: 5173,
   viteServerSecure: false,
+  printViteDevServerHost: false,
 };
+type ConfigurationOptions = Partial<Omit<typeof Config, "viteServerSecure">>;
 
 function getViteHost() {
   return `${Config.viteServerSecure ? "https" : "http"}://localhost:${
@@ -80,7 +82,8 @@ async function startDevServer() {
 
   Config.viteServerSecure = Boolean(server.config.server.https);
 
-  info(`Vite is listening ${pc.gray(getViteHost())}`);
+  if (Config.printViteDevServerHost)
+    info(`Vite is listening ${pc.gray(getViteHost())}`);
 
   return server;
 }
@@ -112,9 +115,11 @@ async function serveHTML(app: core.Express) {
   }
 }
 
-function config(config: Partial<typeof Config>) {
+function config(config: ConfigurationOptions) {
   if (config.mode) Config.mode = config.mode;
   if (config.vitePort) Config.vitePort = config.vitePort;
+  if (config.printViteDevServerHost)
+    Config.printViteDevServerHost = config.printViteDevServerHost;
 }
 
 async function bind(
