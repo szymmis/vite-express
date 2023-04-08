@@ -1,8 +1,5 @@
 name: Test the package
-on: 
-  push:
-    branches-ignore:
-      - 'master'
+on: pull_request
 jobs:
   test-npm:
     name: Run tests on npm build
