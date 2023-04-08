@@ -13,7 +13,7 @@ for (const template of templates) {
     await installYarn();
     it("yarn installed");
 
-    await expectCommandOutput("yarn dev", [/Vite is listening/]);
+    await expectCommandOutput("yarn dev", [/Running in/, /development/]);
     it("dev command works");
 
     await expectCommandOutput("yarn build");

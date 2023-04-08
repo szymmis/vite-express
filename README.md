@@ -166,10 +166,11 @@ ViteExpress.config({ /*...*/ });
 
 #### 🔧 Available options
 
-| name     | description                                                                                                                         | default       | valid values                |
-| -------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------- | --------------------------- |
-| mode     | When set to development Vite Dev Server will be utilized, in production app will serve static files built with `vite build` command | `development` | `development`, `production` |
-| vitePort | Port that Vite Dev Server will be listening on                                                                                      | `5173`        | any number                  |
+| name                   | description                                                                                                                            | default       | valid values                |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------- | --------------------------- |
+| mode                   | When set to development Vite Dev Server will be utilized, in production app will serve static files built with `vite build` command    | `development` | `development`, `production` |
+| vitePort               | Port that Vite Dev Server will be listening on                                                                                         | `5173`        | any number                  |
+| printViteDevServerHost | When set to true, Vite's dev server host (e.g. `http://localhost:5173`) will be printed to console. Should be used only for debug info | `false`       | boolean                     |
 
 ### `listen(app, port, callback?) => http.Server`
 
