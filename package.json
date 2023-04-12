@@ -1,6 +1,6 @@
 {
   "name": "vite-express",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "author": "szymmis",
