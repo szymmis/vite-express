@@ -14,7 +14,7 @@ const Config = {
   mode: (NODE_ENV === "production" ? "production" : "development") as
     | "production"
     | "development",
-  assetRoot: undefined,
+  assetRoot: undefined as string | undefined,
   vitePort: 5173,
   viteServerSecure: false,
   printViteDevServerHost: false,
