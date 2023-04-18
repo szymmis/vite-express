@@ -14,6 +14,7 @@ const Config = {
   mode: (NODE_ENV === "production" ? "production" : "development") as
     | "production"
     | "development",
+  assetRoot: undefined,
   vitePort: 5173,
   viteServerSecure: false,
   printViteDevServerHost: false,
@@ -73,6 +74,7 @@ async function serveStatic(app: core.Express) {
 
 async function startDevServer() {
   const server = await Vite.createServer({
+    root: Config.assetRoot,
     clearScreen: false,
     server: { port: Config.vitePort },
   }).then((server) => server.listen());
@@ -91,7 +93,8 @@ async function startDevServer() {
 async function serveHTML(app: core.Express) {
   if (Config.mode === "production") {
     const config = await Vite.resolveConfig({}, "build");
-    const distPath = path.resolve(config.root, config.build.outDir);
+    const root = Config.assetRoot || config.root;
+    const distPath = path.resolve(root, config.build.outDir);
 
     app.use("*", (_, res) => {
       res.sendFile(path.resolve(distPath, "index.html"));
@@ -120,6 +123,7 @@ function config(config: ConfigurationOptions) {
   if (config.vitePort) Config.vitePort = config.vitePort;
   if (config.printViteDevServerHost)
     Config.printViteDevServerHost = config.printViteDevServerHost;
+  if (config.assetRoot) Config.assetRoot = config.assetRoot;
 }
 
 async function bind(
