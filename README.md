@@ -25,6 +25,7 @@ const app = express();
 app.get("/message", (_, res) => res.send("Hello from express!"));
 
 ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
+// or `ViteExpress.listenOnHost(app, 3000, '0.0.0.0', () => console.log("Server is listening..."));`
 ```
 
 `⚡ vite-express` takes care of
@@ -197,7 +198,7 @@ Used to inject necessary middleware into the app, but does not start the listeni
 
 ```js
 const app = express();
-const server = http.createServer(app).listen(3000, () => { 
+const server = http.createServer(app).listen(3000, () => {
    console.log("Server is listening!")
 });
 ViteExpress.bind(app, server);

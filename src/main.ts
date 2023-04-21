@@ -142,10 +142,20 @@ function listen(app: core.Express, port: number, callback?: () => void) {
   return server;
 }
 
+function listenOnHost(
+  app: core.Express,
+  port: number,
+  host: string,
+  callback?: () => void
+) {
+  const server = app.listen(port, host, () => bind(app, server, callback));
+  return server;
+}
+
 async function build() {
   info("Build starting...");
   await Vite.build();
   info("Build completed!");
 }
 
-export default { config, bind, listen, build };
+export default { config, bind, listen, listenOnHost, build };
