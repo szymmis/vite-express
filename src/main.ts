@@ -100,7 +100,7 @@ async function serveHTML(app: core.Express) {
     app.get("/*", async (req, res, next) => {
       if (isStaticFilePath(req.path)) return next();
 
-      fetch(getViteHost())
+      fetch(`${getViteHost()}${req.path}`)
         .then((res) => res.text())
         .then((content) =>
           content.replace(
