@@ -55,7 +55,7 @@ async function serveStatic(app: core.Express) {
   } else {
     app.use((req, res, next) => {
       if (isStaticFilePath(req.path)) {
-        fetch(`${getViteHost()}${req.path}`).then((response) => {
+        fetch(new URL(req.path, getViteHost())).then((response) => {
           if (!response.ok) return next();
           res.redirect(response.url);
         });
@@ -100,7 +100,7 @@ async function serveHTML(app: core.Express) {
     app.get("/*", async (req, res, next) => {
       if (isStaticFilePath(req.path)) return next();
 
-      fetch(getViteHost())
+      fetch(new URL(req.path, getViteHost()))
         .then((res) => res.text())
         .then((content) =>
           content.replace(
