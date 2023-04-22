@@ -27,7 +27,7 @@ app.get("/message", (_, res) => res.send("Hello from express!"));
 ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
 ```
 
-You can also specify the desired host:
+You can also bind into the express app, to be able to do things such as specifying custom host address or creating your own server instance (e.g., when you want to use the `https:` protocol).
 
 ```js
 import express from "express";
