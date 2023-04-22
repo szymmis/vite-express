@@ -17,14 +17,29 @@
 With [Vite](https://vitejs.dev/) you can easily bootstrap your project and just start working without figuring everything out. That's great for front-end apps, but when you want to include server-side into the mix, things get quite complicated. Thanks to **vite-express** you can just as easily start writing full-stack app in seconds.
 
 ```javascript
-const express = require("express");
-const ViteExpress = require("vite-express");
+import express from "express";
+import ViteExpress from "vite-express";
 
 const app = express();
 
 app.get("/message", (_, res) => res.send("Hello from express!"));
 
 ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
+```
+
+You can also bind into the express app, to be able to do things such as specifying custom host address or creating your own server instance (e.g., when you want to use the `https:` protocol).
+
+```js
+import express from "express";
+import ViteExpress from "vite-express";
+
+const app = express();
+
+const server = app.listen(3000, "0.0.0.0", () =>
+  console.log("Server is listening...")
+);
+
+ViteExpress.bind(app, server);
 ```
 
 `⚡ vite-express` takes care of
@@ -197,7 +212,7 @@ Used to inject necessary middleware into the app, but does not start the listeni
 
 ```js
 const app = express();
-const server = http.createServer(app).listen(3000, () => { 
+const server = http.createServer(app).listen(3000, () => {
    console.log("Server is listening!")
 });
 ViteExpress.bind(app, server);
