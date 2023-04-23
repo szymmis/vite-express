@@ -116,9 +116,9 @@ async function serveHTML(app: core.Express) {
 }
 
 function config(config: ConfigurationOptions) {
-  if (config.mode) Config.mode = config.mode;
-  if (config.vitePort) Config.vitePort = config.vitePort;
-  if (config.printViteDevServerHost)
+  if (config.mode !== undefined) Config.mode = config.mode;
+  if (config.vitePort !== undefined) Config.vitePort = config.vitePort;
+  if (config.printViteDevServerHost !== undefined)
     Config.printViteDevServerHost = config.printViteDevServerHost;
 }
 
