@@ -36,9 +36,9 @@ test("Express app", async (done) => {
     it("html is served correctly");
 
     response = await request(app).get("/test.txt");
-    expect(response.text).toMatch(/Found. Redirecting to/);
+    expect(response.text).toBe("Hello from test.txt");
 
-    it("redirects to vite on static file request");
+    it("static files are served correctly");
 
     server.close(() => {
       process.chdir(baseDir);
@@ -78,9 +78,9 @@ test("Express app with custom http server", async (done) => {
     it("html is served correctly");
 
     response = await request(app).get("/test.txt");
-    expect(response.text).toMatch(/Found. Redirecting to/);
+    expect(response.text).toBe("Hello from test.txt");
 
-    it("redirects to vite on static file request");
+    it("static files are served correctly");
 
     server.close(() => {
       process.chdir(baseDir);
