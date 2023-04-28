@@ -36,7 +36,7 @@ function info(msg: string) {
 }
 
 function isStaticFilePath(path: string) {
-  return path.match(/\.\w+$/);
+  return path.match(/(\.\w+$)|@vite|@id|@react-refresh/);
 }
 
 async function serveStatic(app: core.Express) {
@@ -55,9 +55,19 @@ async function serveStatic(app: core.Express) {
   } else {
     app.use((req, res, next) => {
       if (isStaticFilePath(req.path)) {
-        fetch(new URL(req.path, getViteHost())).then((response) => {
-          if (!response.ok) return next();
-          res.redirect(response.url);
+        fetch(new URL(req.url, getViteHost())).then(async (viteResponse) => {
+          if (!viteResponse.ok) return next();
+
+          viteResponse.headers.forEach((value, name) => res.set(name, value));
+
+          if (req.path.match(/@vite\/client/)) {
+            const text = await viteResponse.text();
+            return res.send(
+              text.replace(/hmrPort = null/, `hmrPort = ${Config.vitePort}`)
+            );
+          }
+
+          viteResponse.body.pipe(res);
         });
       } else next();
     });
@@ -100,17 +110,10 @@ async function serveHTML(app: core.Express) {
     app.get("/*", async (req, res, next) => {
       if (isStaticFilePath(req.path)) return next();
 
-      fetch(new URL(req.path, getViteHost()))
-        .then((res) => res.text())
-        .then((content) =>
-          content.replace(
-            /(\/@react-refresh|\/@vite\/client)/g,
-            `${getViteHost()}$1`
-          )
-        )
-        .then((content) =>
-          res.header("Content-Type", "text/html").send(content)
-        );
+      fetch(new URL(req.path, getViteHost())).then((viteResponse) => {
+        viteResponse.headers.forEach((value, name) => res.set(name, value));
+        viteResponse.body.pipe(res);
+      });
     });
   }
 }
