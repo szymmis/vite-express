@@ -1,4 +1,4 @@
-import express from "express";
+import express, { RequestHandler } from "express";
 import core from "express-serve-static-core";
 import fs from "fs";
 import http from "http";
@@ -39,12 +39,13 @@ function isStaticFilePath(path: string) {
   return path.match(/(\.\w+$)|@vite|@id|@react-refresh/);
 }
 
-async function serveStatic(app: core.Express) {
+const stubMiddleware: RequestHandler = (req, res, next) => next();
+
+async function serveStatic(): Promise<RequestHandler> {
   info(`Running in ${pc.yellow(Config.mode)} mode`);
   if (Config.mode === "production") {
     const config = await Vite.resolveConfig({}, "build");
     const distPath = path.resolve(config.root, config.build.outDir);
-    app.use(express.static(distPath));
 
     if (!fs.existsSync(distPath)) {
       info(`${pc.yellow(`Static files at ${pc.gray(distPath)} not found!`)}`);
@@ -52,33 +53,43 @@ async function serveStatic(app: core.Express) {
     }
 
     info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
-  } else {
-    app.use((req, res, next) => {
-      if (isStaticFilePath(req.path)) {
-        fetch(new URL(req.url, getViteHost())).then(async (viteResponse) => {
-          if (!viteResponse.ok) return next();
 
-          viteResponse.headers.forEach((value, name) => res.set(name, value));
-
-          if (req.path.match(/@vite\/client/)) {
-            const text = await viteResponse.text();
-            return res.send(
-              text.replace(/hmrPort = null/, `hmrPort = ${Config.vitePort}`)
-            );
-          }
-
-          viteResponse.body.pipe(res);
-        });
-      } else next();
-    });
+    return express.static(distPath);
   }
 
-  const layer = app._router.stack.pop();
-  app._router.stack = [
-    ...app._router.stack.slice(0, 2),
-    layer,
-    ...app._router.stack.slice(2),
-  ];
+  return (req, res, next) => {
+    if (isStaticFilePath(req.path)) {
+      fetch(new URL(req.url, getViteHost())).then(async (viteResponse) => {
+        if (!viteResponse.ok) return next();
+
+        viteResponse.headers.forEach((value, name) => res.set(name, value));
+
+        if (req.path.match(/@vite\/client/)) {
+          const text = await viteResponse.text();
+          return res.send(
+            text.replace(/hmrPort = null/, `hmrPort = ${Config.vitePort}`)
+          );
+        }
+
+        viteResponse.body.pipe(res);
+      });
+    } else next();
+  };
+}
+
+async function injectStaticMiddleware(app: core.Express) {
+  app.use(await serveStatic());
+
+  const stubMiddlewareLayer = app._router.stack.find(
+    (layer: { handle?: RequestHandler }) => layer.handle === stubMiddleware
+  );
+
+  if (stubMiddlewareLayer !== undefined) {
+    const serveStaticLayer = app._router.stack.pop();
+    app._router.stack = app._router.stack.map((layer: unknown) => {
+      return layer === stubMiddlewareLayer ? serveStaticLayer : layer;
+    });
+  }
 }
 
 async function startDevServer() {
@@ -135,7 +146,7 @@ async function bind(
     server.on("close", () => devServer?.close());
   }
 
-  await serveStatic(app);
+  await injectStaticMiddleware(app);
   await serveHTML(app);
   callback?.();
 }
@@ -151,4 +162,4 @@ async function build() {
   info("Build completed!");
 }
 
-export default { config, bind, listen, build };
+export default { config, static: () => stubMiddleware, bind, listen, build };
