@@ -51,6 +51,65 @@ test("Express app", async (done) => {
   });
 });
 
+test("Express app with explicit static middleware", async (done) => {
+  process.chdir(path.join(__dirname, "env"));
+
+  const app = express();
+
+  app.use((_, res, next) => {
+    res.header("before", "1");
+    next();
+  });
+  app.use(ViteExpress.static());
+  app.use((_, res, next) => {
+    res.header("after", "1");
+    next();
+  });
+
+  app.get("/hello", (_, res) => {
+    res.send("Hello Vite Express!");
+  });
+
+  const server = ViteExpress.listen(app, 3000, async () => {
+    let response = await request(app).get("/hello");
+    expect(response.text).toBe("Hello Vite Express!");
+
+    response = await request(app).get("/api");
+    expect(response.text).toBe("Response from API!");
+
+    it("get api routes work");
+
+    response = await request(app).get("/");
+    expect(response.text).toMatch(/<body>/);
+    response = await request(app).get("/route");
+    expect(response.text).toMatch(/<body>/);
+
+    it("html is served correctly");
+
+    expect(response.headers.before).toBe("1");
+    expect(response.headers.after).toBe("1");
+
+    response = await request(app).get("/test.txt");
+    expect(response.text).toBe("Hello from test.txt");
+
+    it("static files are served correctly");
+
+    expect(response.headers.before).toBe("1");
+    expect(response.headers.after).toBe(undefined);
+
+    it("static files middleware respects invocation order");
+
+    server.close(() => {
+      process.chdir(baseDir);
+      done();
+    });
+  });
+
+  app.get("/api", (_, res) => {
+    res.send("Response from API!");
+  });
+});
+
 test("Express app with custom http server", async (done) => {
   process.chdir(path.join(__dirname, "env"));
 
