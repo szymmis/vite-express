@@ -152,7 +152,7 @@ You have these options to achieve that
 
 The way `vite-express` works is quite simple. As soon as you invoke `ViteExpress.listen`:
 
-- Static files serving middleware is injected at the beginning of express middlewares stack. We do this to ensure that nothing will block your server from sending files like `.js`, `.css` etc. You can think about this middleware as the same as [`express.static`](https://expressjs.com/en/starter/static-files.html) but for files served by Vite. In production files are not served from Vite but instead from dist folder using said `express.static` middleware
+- Static files serving middleware is injected at the end of express middlewares stack, but you can change that by using `ViteExpress.static` middleware to precisely describe at what point do you want to serve static files. This middleware takes care of serving static files from the Vite Dev Server in `development` mode and in `production` mode [`express.static`](https://expressjs.com/en/starter/static-files.html) is used instead.
 
 - A GET routes handler `get("*")` is registered at the end of middleware stack to handle all the routes that were unhandled by you. We do this to ensure that client-side routing is possible.
 
@@ -167,6 +167,7 @@ Because `ViteExpress.listen` is an async function, in most cases it doesn't matt
 | [`config(options) => void`](#configoptions--void)                                                    |
 | [`listen(app, port, callback?) => http.Server`](#listenapp-port-callback--httpserver)                |
 | [`async bind(app, server, callback?) => Promise<void>`](#async-bindapp-server-callback--promisevoid) |
+| [`static() => RequestHandler`](#static--requesthandler)                                              |
 | [`async build() => Promise<void>`](#async-build--promisevoid)                                        |
 
 ---
@@ -217,6 +218,28 @@ const server = http.createServer(app).listen(3000, () => {
 });
 ViteExpress.bind(app, server);
 ```
+
+### `static() => RequestHandler`
+
+Used as a typical express middleware to indicate to `vite-express` the exact moment when you want to register static serving logic. You can use this method to prevent some of your request blocking middleware, such as authentication/authorization, from blocking files coming from your server, which would make displaying for example login page impossible because of blocked html, styles and scripts files.
+
+Example:
+
+```javascript
+import express from "express"
+import yourAuthMiddleware from "some/path"
+
+const app = express()
+
+app.use(ViteExpress.static())
+app.use(yourAuthMiddleware())
+
+app.get("/", ()=> /*...*/ )
+
+ViteExpress.listen(app, 3000,  () => console.log("Server is listening!"))
+```
+
+You should use it when the default behaviour of serving static files at the end of middleware chain doesn't work for you because you block requests in some way.
 
 ### `async build() => Promise<void>`
 
