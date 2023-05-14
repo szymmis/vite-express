@@ -21,9 +21,8 @@ const Config = {
 type ConfigurationOptions = Partial<Omit<typeof Config, "viteServerSecure">>;
 
 function getViteHost() {
-  return `${Config.viteServerSecure ? "https" : "http"}://localhost:${
-    Config.vitePort
-  }`;
+  const protocol = `${Config.viteServerSecure ? "https" : "http"}`;
+  return `${protocol}://localhost:${Config.vitePort}`;
 }
 
 function info(msg: string) {
@@ -62,8 +61,6 @@ async function serveStatic(): Promise<RequestHandler> {
       fetch(new URL(req.url, getViteHost())).then(async (viteResponse) => {
         if (!viteResponse.ok) return next();
 
-        viteResponse.headers.forEach((value, name) => res.set(name, value));
-
         if (req.path.match(/@vite\/client/)) {
           const text = await viteResponse.text();
           return res.send(
@@ -71,6 +68,7 @@ async function serveStatic(): Promise<RequestHandler> {
           );
         }
 
+        viteResponse.headers.forEach((value, name) => res.set(name, value));
         viteResponse.body.pipe(res);
       });
     } else next();
@@ -96,7 +94,9 @@ async function startDevServer() {
   const server = await Vite.createServer({
     clearScreen: false,
     server: { port: Config.vitePort },
-  }).then((server) => server.listen());
+  });
+
+  await server.listen();
 
   const vitePort = server.config.server.port;
   if (vitePort && vitePort !== Config.vitePort) Config.vitePort = vitePort;
@@ -162,4 +162,4 @@ async function build() {
   info("Build completed!");
 }
 
-export default { config, static: () => stubMiddleware, bind, listen, build };
+export default { config, bind, listen, build, static: () => stubMiddleware };
