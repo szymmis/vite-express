@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0 (2023-05-14)
+
+- Add `ViteExpress.static()` middleware-like function to change the order of `vite-express'` injected static files serving middleware.
+
 ## 0.6.0 (2023-04-28)
 
 - Stop using redirection to Vite Dev Server when serving static files in dev mode.
