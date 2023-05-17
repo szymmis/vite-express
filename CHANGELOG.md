@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1 (2023-05-17)
+
+- Turn off `index.html` serving functionality of `express.static()` middleware in production mode
+
 ## 0.7.0 (2023-05-14)
 
 - Add `ViteExpress.static()` middleware-like function to change the order of `vite-express'` injected static files serving middleware.
