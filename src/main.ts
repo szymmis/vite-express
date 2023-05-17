@@ -61,6 +61,8 @@ async function serveStatic(): Promise<RequestHandler> {
       fetch(new URL(req.url, getViteHost())).then(async (viteResponse) => {
         if (!viteResponse.ok) return next();
 
+        viteResponse.headers.forEach((value, name) => res.set(name, value));
+
         if (req.path.match(/@vite\/client/)) {
           const text = await viteResponse.text();
           return res.send(
@@ -68,7 +70,6 @@ async function serveStatic(): Promise<RequestHandler> {
           );
         }
 
-        viteResponse.headers.forEach((value, name) => res.set(name, value));
         viteResponse.body.pipe(res);
       });
     } else next();
