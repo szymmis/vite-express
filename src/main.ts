@@ -53,7 +53,7 @@ async function serveStatic(): Promise<RequestHandler> {
 
     info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
 
-    return express.static(distPath);
+    return express.static(distPath, { index: false });
   }
 
   return (req, res, next) => {
