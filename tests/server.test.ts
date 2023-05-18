@@ -6,7 +6,7 @@ import { io as SocketIOClient } from "socket.io-client";
 import request from "supertest";
 
 import ViteExpress from "../src/main";
-import { expect, it, test } from "./lib/runner";
+import { expect, it, run, test } from "./lib/runner";
 
 const baseDir = process.cwd();
 
@@ -189,6 +189,8 @@ test("Express app with socket.io", async (done) => {
 });
 
 test("Multi-page app", async (done) => {
+  if (process.env["NODE_ENV"] === "production") return done();
+
   process.chdir(path.join(__dirname, "env"));
 
   const app = express();
@@ -207,3 +209,5 @@ test("Multi-page app", async (done) => {
     });
   });
 });
+
+run();

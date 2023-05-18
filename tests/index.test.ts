@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
 
-import { run } from "./lib/runner";
+import { runTestFile } from "./lib/runner";
 import { isLocalBuild } from "./lib/utils";
 
 if (isLocalBuild()) {
@@ -9,8 +9,7 @@ if (isLocalBuild()) {
   });
 }
 
-require("./server.test");
-require("./templates.test");
-require("./cli.test");
-
-run();
+runTestFile("server.test.ts");
+runTestFile("server.test.ts", { mode: "production" });
+runTestFile("templates.test.ts");
+runTestFile("cli.test.ts");

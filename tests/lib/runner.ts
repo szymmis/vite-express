@@ -1,4 +1,4 @@
-import { spawn } from "child_process";
+import { execSync, spawn } from "child_process";
 import pc from "picocolors";
 
 import { getExecutionTimeSeconds, log, wait } from "../lib/utils";
@@ -115,6 +115,16 @@ process.on("unhandledRejection", (e) => {
   printSummary();
   process.exit(1);
 });
+
+export function runTestFile(
+  fileName: string,
+  options?: { mode: "production" | "development" }
+) {
+  execSync(`ts-node tests/${fileName}`, {
+    stdio: "inherit",
+    env: { ...process.env, NODE_ENV: options?.mode ?? "development" },
+  });
+}
 
 function printSummary() {
   log.summary(
