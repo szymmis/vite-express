@@ -1,6 +1,6 @@
 import fs from "fs";
 
-import { expectCommandOutput, it, test } from "./lib/runner";
+import { expectCommandOutput, it, run, test } from "./lib/runner";
 import { installYarn } from "./lib/utils";
 
 const baseDir = process.cwd();
@@ -26,3 +26,5 @@ for (const template of templates) {
     done();
   });
 }
+
+run();

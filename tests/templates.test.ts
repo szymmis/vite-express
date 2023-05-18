@@ -3,7 +3,7 @@ import fs from "fs";
 import puppeteer from "puppeteer";
 
 import ViteExpress from "../src/main";
-import { expect, it, test } from "./lib/runner";
+import { expect, it, run, test } from "./lib/runner";
 import {
   getButton,
   getButtonText,
@@ -90,3 +90,5 @@ for (const template of templates) {
     });
   });
 }
+
+run();
