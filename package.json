@@ -20,7 +20,6 @@
     "publish:cli": "bash scripts/publish-cli.sh"
   },
   "dependencies": {
-    "node-fetch": "^2.0.0",
     "picocolors": "^1.0.0"
   },
   "peerDependencies": {
