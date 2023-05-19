@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.0 (2023-05-19)
+
+- Use `Vite Dev Server` in middleware mode when running in development instead of a proxied separate Vite process
+- Temporarily drop support for multi-page apps
+
 ## 0.7.1 (2023-05-17)
 
 - Turn off `index.html` serving functionality of `express.static()` middleware in production mode
