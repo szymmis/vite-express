@@ -44,8 +44,7 @@ ViteExpress.bind(app, server);
 
 `⚡ vite-express` takes care of
 
-- spinning up **Vite's Dev Server**
-- injecting necessary middlewares to **static files** from your API
+- injecting necessary middleware to serve **static files** from your express server
 - managing unhandled routes to make **client-side routing** possible
 
 The only thing that is left to you is **to code**! 🎉
@@ -122,7 +121,7 @@ Congrats, you've just created your first `vite-express` app! 🎉 Happy hacking!
 
 ## 🚚 Shipping to production
 
-By default vite-express runs in **development** mode, when server acts as a simple proxy between client and Vite's Dev Server utilizing the power of HMR and native browser modules. This is not suitable for production as described [here](https://vitejs.dev/guide/why.html#why-bundle-for-production), so in production we want to serve static files that Vite spits out during it's build process. That's why you need to invoke [`vite build`](https://vitejs.dev/guide/cli.html#build) command first. Then you need to run your app in production mode.
+By default vite-express runs in **development** mode, when server uses Vite's Dev Server in middleware mode (which means that no separate Vite process is running) utilizing the power of HMR and native browser modules. This is not suitable for production as described [here](https://vitejs.dev/guide/why.html#why-bundle-for-production), so in production we want to serve static files that Vite spits out during it's build process. That's why you need to invoke [`vite build`](https://vitejs.dev/guide/cli.html#build) command first. Then you need to run your app in production mode.
 
 You have these options to achieve that
 
@@ -156,9 +155,7 @@ The way `vite-express` works is quite simple. As soon as you invoke `ViteExpress
 
 - A GET routes handler `get("*")` is registered at the end of middleware stack to handle all the routes that were unhandled by you. We do this to ensure that client-side routing is possible.
 
-- Lastly **Vite Dev Server** is started up, listening on port **5173** or the one that you pass into configuration.
-
-Because `ViteExpress.listen` is an async function, in most cases it doesn't matter when you invoke it, but it is generally the best to do it at the end of file to avoid `get("*")` handler overriting your routes.
+Because `ViteExpress.listen` is an async function, in most cases it doesn't matter when you invoke it, but it is generally the best to do it at the end of file to avoid `get("*")` handler overriding your routes.
 
 ## 📝 Documentation
 
@@ -182,11 +179,9 @@ ViteExpress.config({ /*...*/ });
 
 #### 🔧 Available options
 
-| name                   | description                                                                                                                            | default       | valid values                |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------- | --------------------------- |
-| mode                   | When set to development Vite Dev Server will be utilized, in production app will serve static files built with `vite build` command    | `development` | `development`, `production` |
-| vitePort               | Port that Vite Dev Server will be listening on                                                                                         | `5173`        | any number                  |
-| printViteDevServerHost | When set to true, Vite's dev server host (e.g. `http://localhost:5173`) will be printed to console. Should be used only for debug info | `false`       | boolean                     |
+| name | description                                                                                                                         | default       | valid values                |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------- | --------------------------- |
+| mode | When set to development Vite Dev Server will be utilized, in production app will serve static files built with `vite build` command | `development` | `development`, `production` |
 
 ### `listen(app, port, callback?) => http.Server`
 
