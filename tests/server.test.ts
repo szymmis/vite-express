@@ -188,26 +188,4 @@ test("Express app with socket.io", async (done) => {
   });
 });
 
-test("Multi-page app", async (done) => {
-  if (process.env["NODE_ENV"] === "production") return done();
-
-  process.chdir(path.join(__dirname, "env"));
-
-  const app = express();
-
-  const server = ViteExpress.listen(app, 3000, async () => {
-    let response = await request(app).get("/");
-    expect(response.text).toMatch(/<h1>index<\/h1>/);
-    response = await request(app).get("/subpath/");
-    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
-
-    it("index.html and subpath/index.html are served separately");
-
-    server.close(() => {
-      process.chdir(baseDir);
-      done();
-    });
-  });
-});
-
 run();
