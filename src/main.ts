@@ -92,7 +92,12 @@ async function startServer(server: http.Server | https.Server) {
   const vite = await Vite.createServer({
     clearScreen: false,
     appType: "custom",
-    server: { middlewareMode: true },
+    server: {
+      middlewareMode: true,
+      hmr: {
+        server,
+      },
+    },
   });
   server.on("close", () => vite.close());
 
