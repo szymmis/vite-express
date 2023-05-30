@@ -49,9 +49,9 @@ async function injectStaticMiddleware(
   app: core.Express,
   middleware: RequestHandler
 ) {
-  const config = await Vite.resolveConfig({}, "build");
-  const base = config.base || "/";
-  app.use(base, middleware);
+  const { base } = await Vite.resolveConfig({}, "build");
+  if (base === "/") app.use(middleware);
+  else app.use(base, middleware);
 
   const stubMiddlewareLayer = app._router.stack.find(
     (layer: { handle?: RequestHandler }) => layer.handle === stubMiddleware
