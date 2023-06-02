@@ -44,6 +44,10 @@ function getTransformedHTML(html: string, req: express.Request) {
   return Config.transformer ? Config.transformer(html, req) : html;
 }
 
+function isRunningViteless() {
+  return Config.inlineViteConfig !== undefined;
+}
+
 async function resolveConfig() {
   if (!Config.inlineViteConfig) {
     const { resolveConfig } = await import("vite");
@@ -163,6 +167,12 @@ async function bind(
     await injectStaticMiddleware(app, vite.middlewares);
     await injectViteIndexMiddleware(app, vite);
   } else {
+    if (isRunningViteless()) {
+      info(
+        `Custom inline config defined, running in ${pc.yellow("viteless")} mode`
+      );
+    }
+
     await injectStaticMiddleware(app, await serveStatic());
     await injectIndexMiddleware(app);
   }
