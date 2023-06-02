@@ -27,6 +27,8 @@ for (const template of templates) {
     process.chdir(`create-vite-express/templates/${template}`);
     await installYarn();
 
+    await ViteExpress.build();
+
     ViteExpress.config({ inlineViteConfig: undefined });
     await testCase(template, done);
   });
