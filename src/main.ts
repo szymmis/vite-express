@@ -5,19 +5,27 @@ import http from "http";
 import https from "https";
 import path from "path";
 import pc from "picocolors";
-import Vite from "vite";
+import type { ViteDevServer } from "vite";
 
 const { NODE_ENV } = process.env;
+
+type ViteConfig = {
+  root?: string;
+  base?: string;
+  build?: { outDir: string };
+};
 
 const Config = {
   mode: (NODE_ENV === "production" ? "production" : "development") as
     | "production"
     | "development",
+  inlineViteConfig: undefined as ViteConfig | undefined,
   transformer: undefined as
     | undefined
     | ((html: string, req: express.Request) => string),
 };
-type ConfigurationOptions = Partial<Omit<typeof Config, "viteServerSecure">>;
+
+type ConfigurationOptions = Partial<typeof Config>;
 
 function info(msg: string) {
   const timestamp = new Date().toLocaleString("en-US").split(",")[1].trim();
@@ -36,16 +44,39 @@ function getTransformedHTML(html: string, req: express.Request) {
   return Config.transformer ? Config.transformer(html, req) : html;
 }
 
-async function serveStatic(): Promise<RequestHandler> {
-  const config = await Vite.resolveConfig({}, "build");
-  const distPath = path.resolve(config.root, config.build.outDir);
-
-  if (!fs.existsSync(distPath)) {
-    info(`${pc.yellow(`Static files at ${pc.gray(distPath)} not found!`)}`);
-    await build();
+async function resolveConfig() {
+  if (!Config.inlineViteConfig) {
+    const { resolveConfig } = await import("vite");
+    return resolveConfig({}, "build");
   }
 
-  info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
+  const {
+    root = process.cwd(),
+    base = "/",
+    build = { outDir: "dist" },
+  } = Config.inlineViteConfig;
+
+  return { root, base, build };
+}
+
+async function getDistPath() {
+  const config = await resolveConfig();
+  return path.resolve(config.root, config.build.outDir);
+}
+
+async function serveStatic(): Promise<RequestHandler> {
+  const distPath = await getDistPath();
+
+  if (!fs.existsSync(distPath)) {
+    info(`${pc.red(`Static files at ${pc.gray(distPath)} not found!`)}`);
+    info(
+      `${pc.yellow(
+        `Did you forget to run ${pc.bold(pc.green("vite build"))} command?`
+      )}`
+    );
+  } else {
+    info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
+  }
 
   return express.static(distPath, { index: false });
 }
@@ -56,7 +87,7 @@ async function injectStaticMiddleware(
   app: core.Express,
   middleware: RequestHandler
 ) {
-  const config = await Vite.resolveConfig({}, "build");
+  const config = await resolveConfig();
   const base = config.base || "/";
   app.use(base, middleware);
 
@@ -74,9 +105,9 @@ async function injectStaticMiddleware(
 
 async function injectViteIndexMiddleware(
   app: core.Express,
-  server: Vite.ViteDevServer
+  server: ViteDevServer
 ) {
-  const config = await Vite.resolveConfig({}, "build");
+  const config = await resolveConfig();
   const template = fs.readFileSync(
     path.resolve(config.root, "index.html"),
     "utf8"
@@ -92,8 +123,7 @@ async function injectViteIndexMiddleware(
 }
 
 async function injectIndexMiddleware(app: core.Express) {
-  const config = await Vite.resolveConfig({}, "build");
-  const distPath = path.resolve(config.root, config.build.outDir);
+  const distPath = await getDistPath();
 
   const html = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
 
@@ -103,7 +133,9 @@ async function injectIndexMiddleware(app: core.Express) {
 }
 
 async function startServer(server: http.Server | https.Server) {
-  const vite = await Vite.createServer({
+  const { createServer } = await import("vite");
+
+  const vite = await createServer({
     clearScreen: false,
     appType: "custom",
     server: { middlewareMode: true },
@@ -115,6 +147,7 @@ async function startServer(server: http.Server | https.Server) {
 
 function config(config: ConfigurationOptions) {
   if (config.mode !== undefined) Config.mode = config.mode;
+  Config.inlineViteConfig = config.inlineViteConfig;
   Config.transformer = config.transformer;
 }
 
@@ -143,8 +176,10 @@ function listen(app: core.Express, port: number, callback?: () => void) {
 }
 
 async function build() {
+  const { build } = await import("vite");
+
   info("Build starting...");
-  await Vite.build();
+  await build();
   info("Build completed!");
 }
 
