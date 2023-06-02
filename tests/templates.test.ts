@@ -44,7 +44,7 @@ for (const template of templates) {
           "<title>Test - $1</title>"
         );
 
-        await wait(100);
+        await wait(200);
 
         let button = await getButton(page);
         await button?.click();
@@ -56,7 +56,7 @@ for (const template of templates) {
           "<title>$1</title>"
         );
 
-        await wait(100);
+        await wait(200);
 
         button = await getButton(page);
         expect(await getButtonText(button)).toBe("count is 0");
@@ -70,11 +70,11 @@ for (const template of templates) {
           await button?.click();
 
           replaceStringInFile(filePath, "count is", "button count is");
-          await wait(100);
+          await wait(200);
           expect(await getButtonText(button)).toBe("button count is 2");
 
           replaceStringInFile(filePath, "button count is", "count is");
-          await wait(100);
+          await wait(200);
           expect(await getButtonText(button)).toBe("count is 2");
 
           it("hot reload works");
