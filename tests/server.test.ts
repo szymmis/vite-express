@@ -188,4 +188,37 @@ test("Express app with socket.io", async (done) => {
   });
 });
 
+test("Express app with transformer function", async (done) => {
+  process.chdir(path.join(__dirname, "env"));
+
+  const app = express();
+
+  ViteExpress.config({
+    transformer: (html) => html.replace("<head>", '<head><meta name="test"/>'),
+  });
+
+  const server = ViteExpress.listen(app, 3000, async () => {
+    let response = await request(app).get("/");
+    expect(response.text).toMatch(/<body>/);
+    response = await request(app).get("/route");
+    expect(response.text).toMatch(/<body>/);
+
+    it("html is served correctly");
+
+    expect(response.text).toMatch(/<meta name="test"\/>/);
+
+    it("html is transformed correctly");
+
+    response = await request(app).get("/test.txt");
+    expect(response.text).toBe("Hello from test.txt");
+
+    it("static files are served correctly");
+
+    server.close(() => {
+      process.chdir(baseDir);
+      done();
+    });
+  });
+});
+
 run();
