@@ -25,70 +25,93 @@ const templatesHotReloadTestFileMap: Record<string, string> = {
 for (const template of templates) {
   test(`Template "${template}"`, async (done) => {
     process.chdir(`create-vite-express/templates/${template}`);
-
     await installYarn();
-    it("yarn installed");
 
-    const server = ViteExpress.listen(express(), 3000, () => {
-      const browser = puppeteer.launch();
+    ViteExpress.config({ inlineViteConfig: undefined });
+    await testCase(template, done);
+  });
 
-      browser.then(async (browser) => {
-        const page = await browser.newPage();
-        await page.goto("http://localhost:3000");
+  test(`Template "${template}" with default inline config`, async (done) => {
+    process.chdir(`create-vite-express/templates/${template}`);
 
-        it("test set up");
+    ViteExpress.config({ inlineViteConfig: {} });
+    await testCase(template, done);
+  });
 
-        replaceStringInFile(
-          "./index.html",
-          /<title>(.+)<\/title>/,
-          "<title>Test - $1</title>"
-        );
+  test(`Template "${template}" with custom inline config`, async (done) => {
+    process.chdir(`create-vite-express/templates/${template}`);
 
-        await wait(200);
+    ViteExpress.config({
+      inlineViteConfig: {
+        root: process.cwd(),
+        base: "/",
+        build: { outDir: "dist" },
+      },
+    });
+    await testCase(template, done);
+  });
+}
 
-        let button = await getButton(page);
+const testCase = async (template: string, done: () => void) => {
+  const server = ViteExpress.listen(express(), 3000, () => {
+    const browser = puppeteer.launch();
+
+    browser.then(async (browser) => {
+      const page = await browser.newPage();
+      await page.goto("http://localhost:3000");
+
+      it("test set up");
+
+      replaceStringInFile(
+        "./index.html",
+        /<title>(.+)<\/title>/,
+        "<title>Test - $1</title>"
+      );
+
+      await wait(200);
+
+      let button = await getButton(page);
+      await button?.click();
+      expect(await getButtonText(button)).toBe("count is 1");
+
+      replaceStringInFile(
+        "./index.html",
+        /<title>Test - (.+)<\/title>/,
+        "<title>$1</title>"
+      );
+
+      await wait(200);
+
+      button = await getButton(page);
+      expect(await getButtonText(button)).toBe("count is 0");
+
+      it("automatic page reload works");
+
+      if (templatesHotReloadTestFileMap[template]) {
+        const filePath = templatesHotReloadTestFileMap[template];
+
         await button?.click();
-        expect(await getButtonText(button)).toBe("count is 1");
+        await button?.click();
 
-        replaceStringInFile(
-          "./index.html",
-          /<title>Test - (.+)<\/title>/,
-          "<title>$1</title>"
-        );
-
+        replaceStringInFile(filePath, "count is", "button count is");
         await wait(200);
+        expect(await getButtonText(button)).toBe("button count is 2");
 
-        button = await getButton(page);
-        expect(await getButtonText(button)).toBe("count is 0");
+        replaceStringInFile(filePath, "button count is", "count is");
+        await wait(200);
+        expect(await getButtonText(button)).toBe("count is 2");
 
-        it("automatic page reload works");
+        it("hot reload works");
+      }
 
-        if (templatesHotReloadTestFileMap[template]) {
-          const filePath = templatesHotReloadTestFileMap[template];
+      await browser.close();
 
-          await button?.click();
-          await button?.click();
-
-          replaceStringInFile(filePath, "count is", "button count is");
-          await wait(200);
-          expect(await getButtonText(button)).toBe("button count is 2");
-
-          replaceStringInFile(filePath, "button count is", "count is");
-          await wait(200);
-          expect(await getButtonText(button)).toBe("count is 2");
-
-          it("hot reload works");
-        }
-
-        await browser.close();
-
-        server.close(() => {
-          process.chdir(baseDir);
-          done();
-        });
+      server.close(() => {
+        process.chdir(baseDir);
+        done();
       });
     });
   });
-}
+};
 
 run();
