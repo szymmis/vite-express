@@ -150,7 +150,9 @@ You have these options to achieve that
 
 ## 🤖 Transforming HTML
 
-You can specify transformer function that takes two arguments - HTML as a string and [`Request`][express-request] object - and apply any string transformation. Can be used to inject your custom metadata on the server-side. Needs to return transformed HTML in form of a string that will be served to the client.
+You can specify transformer function that takes two arguments - HTML as a string and [`Request`][express-request] object - and returns HTML as a string with any string related transformation applied. It can be used to inject your custom metadata on the server-side.
+
+This transformer function is invoked right before sending the HTML to the client in the index-serving middleware that `vite-express` injects at the end of the middleware stack.
 
 Imagine a situation in which your index.html file looks like this
 
@@ -170,6 +172,9 @@ You can then use custom transformer function to replace the HTML comment with an
 ```javascript
 import express from "express";
 import ViteExpress from "vite-express";
+import someMiddleware from "./some/middleware";
+
+const app = express()
 
 function transformer(html: string, req: express.Request) {
    return html.replace(
@@ -178,8 +183,10 @@ function transformer(html: string, req: express.Request) {
    )
 }
 
+app.use(someMiddleware())
+
 ViteExpress.config({ transformer })
-ViteExpress.listen(express(), 3000);
+ViteExpress.listen(app, 3000);
 ```
 
 The HTML served to the client will then look something like this
