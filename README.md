@@ -158,9 +158,9 @@ Imagine a situation in which your index.html file looks like this
 
 ```html
 <html>
-   <meta>
+   <head>
       <!-- placeholder -->
-   </meta>
+   </head>
    <body>
       <div id="root"></div>
    </body>
@@ -193,9 +193,9 @@ The HTML served to the client will then look something like this
 
 ```html
 <html>
-   <meta>
+   <head>
      <meta name="custom" content="/"/>
-   </meta>
+   </head>
    <body>
       <div id="root"></div>
    </body>
