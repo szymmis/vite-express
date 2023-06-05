@@ -148,6 +148,43 @@ You have these options to achieve that
    ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
     ```
 
+### ⚡ Viteless mode
+
+ `vite-express` uses Vite even in production to resolve [`vite.config.js`][vite-config] correctly. If you want to be able to run your production app without Vite and all development dependencies, you need to specify custom inline config using `ViteExpress.config({ inlineViteConfig: ... })`.
+
+Valid configuration values used by `vite-express` are [`root`][root], [`base`][base] and [`outDir`][outDir].
+
+- When `inlineViteConfig` is set to `undefined` (by default) Vite is used in production to resolve config file
+- To use viteless mode with the defaults you can set `inlineViteConfig` as `{}`
+
+   ```javascript
+   import express from "express";
+   import ViteExpress from "vite-express";
+
+   ViteExpress.config({ inlineViteConfig: {} })
+   ViteExpress.listen(express(), 3000);
+   ```
+
+- You can also specify any combination of valid parameters
+
+   ```javascript
+   import express from "express";
+   import ViteExpress from "vite-express";
+
+   ViteExpress.config({ 
+      inlineViteConfig: { 
+         base: "/admin", 
+         build: { outDir: "out" }
+      } 
+   });
+
+   ViteExpress.listen(express(), 3000);
+   ```
+
+Be aware that in viteless mode you have two separate sources of truth - `vite.config.js` and your inline configuration, so you need to manually keep them in sync.
+
+Most of the time you are okay with using Vite in production as it's easier, this approach is only recommended if you want to reduce production dependencies.
+
 ## 🤖 Transforming HTML
 
 You can specify transformer function that takes two arguments - HTML as a string and [`Request`][express-request] object - and returns HTML as a string with any string related transformation applied. It can be used to inject your custom metadata on the server-side.
@@ -234,10 +271,20 @@ ViteExpress.config({ /*...*/ });
 
 #### 🔧 Available options
 
-| name        | description                                                                                                                                                                                                                                                                             | default         | valid values                                            |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------- |
-| mode        | When set to development Vite Dev Server will be utilized, in production app will serve static files built with `vite build` command                                                                                                                                                     | `"development"` | `"development"` \| `"production"`                       |
-| transformer | A function used to transform HTML served to the client, useful when you want to inject some metadata on the server. First argument is the HTML that is about to be sent to the client, second is the [`Request`][express-request] object. Needs to return transformed HTML as a string. | `undefined`     | `undefined` \| `(html: string, req: Request) => string` |
+<<<<<<< HEAD
+| name             | description                                                                                                                                                                                                                                                                             | default         | valid values                                            |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------- |
+| mode             | When set to development Vite Dev Server will be utilized, in production app will serve static files built with `vite build` command                                                                                                                                                     | `"development"` | `"development"` \| `"production"`                       |
+| transformer      | A function used to transform HTML served to the client, useful when you want to inject some metadata on the server. First argument is the HTML that is about to be sent to the client, second is the [`Request`][express-request] object. Needs to return transformed HTML as a string. | `undefined`     | `undefined` \| `(html: string, req: Request) => string` |
+| inlineViteConfig | When set to non-undefined value, `vite-express` will be run in [`viteless mode`](#-viteless-mode)                                                                                                                                                                                       | `undefined`     | `undefined` \| `ViteConfig`                             |
+
+```typescript
+type ViteConfig = {
+   root?: string;
+   base?: string;
+   build?: { outDir: string };
+}
+```
 
 ### `listen(app, port, callback?) => http.Server`
 
@@ -305,3 +352,7 @@ ViteExpress.build();
 [MIT](LICENSE)
 
 [express-request]: https://expressjs.com/en/api.html#req
+[vite-config]: https://vitejs.dev/config/
+[root]: https://vitejs.dev/config/shared-options.html#root
+[base]: https://vitejs.dev/config/shared-options.html#base
+[outDir]: https://vitejs.dev/config/build-options.html#build-outdir
