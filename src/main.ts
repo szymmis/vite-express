@@ -112,12 +112,13 @@ async function injectViteIndexMiddleware(
   server: ViteDevServer
 ) {
   const config = await resolveConfig();
-  const template = fs.readFileSync(
-    path.resolve(config.root, "index.html"),
-    "utf8"
-  );
 
   app.get("/*", async (req, res, next) => {
+    const template = fs.readFileSync(
+      path.resolve(config.root, "index.html"),
+      "utf8"
+    );
+
     if (isStaticFilePath(req.path)) next();
     else {
       const html = await server.transformIndexHtml(req.originalUrl, template);
@@ -129,9 +130,9 @@ async function injectViteIndexMiddleware(
 async function injectIndexMiddleware(app: core.Express) {
   const distPath = await getDistPath();
 
-  const html = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
-
   app.use("*", (req, res) => {
+    const html = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
+
     res.send(getTransformedHTML(html, req));
   });
 }
