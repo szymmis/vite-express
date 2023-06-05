@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.0 (2023-06-05)
+
+- Allow specyfing HTML transformer ([#65](https://github.com/szymmis/vite-express/pull/65))
+- Implement `viteless` mode ([#64](https://github.com/szymmis/vite-express/pull/64))
+- Bump socket.io-parser from 4.2.2 to 4.2.3 ([#61](https://github.com/szymmis/vite-express/pull/61))
+- Add Vite base support ([#57](https://github.com/szymmis/vite-express/pull/57))
+- Remove `node-fetch` from dependencies
+
 ## 0.8.0 (2023-05-19)
 
 - Use `Vite Dev Server` in middleware mode when running in development instead of a proxied separate Vite process
