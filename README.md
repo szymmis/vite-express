@@ -9,6 +9,7 @@
 
 - [📦 Installation \& usage](#-installation--usage)
 - [🚚 Shipping to production](#-shipping-to-production)
+- [🤖 Transforming HTML](#-transforming-html)
 - [🤔 How does it work?](#-how-does-it-work)
 - [📝 Documentation](#-documentation)
 
@@ -147,6 +148,60 @@ You have these options to achieve that
    ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
     ```
 
+## 🤖 Transforming HTML
+
+You can specify transformer function that takes two arguments - HTML as a string and [`Request`][express-request] object - and returns HTML as a string with any string related transformation applied. It can be used to inject your custom metadata on the server-side.
+
+This transformer function is invoked right before sending the HTML to the client in the index-serving middleware that `vite-express` injects at the end of the middleware stack.
+
+Imagine a situation in which your index.html file looks like this
+
+```html
+<html>
+   <head>
+      <!-- placeholder -->
+   </head>
+   <body>
+      <div id="root"></div>
+   </body>
+</html>
+```
+
+You can then use custom transformer function to replace the HTML comment with any string you like. It can be a custom meta tag. You can use request object to extract additional information about request such as requested page.
+
+```javascript
+import express from "express";
+import ViteExpress from "vite-express";
+import someMiddleware from "./some/middleware";
+
+const app = express()
+
+function transformer(html: string, req: express.Request) {
+   return html.replace(
+      "<!-- placeholder -->", 
+      `<meta name="custom" content="${req.baseUrl}"/>`
+   )
+}
+
+app.use(someMiddleware())
+
+ViteExpress.config({ transformer })
+ViteExpress.listen(app, 3000);
+```
+
+The HTML served to the client will then look something like this
+
+```html
+<html>
+   <head>
+     <meta name="custom" content="/"/>
+   </head>
+   <body>
+      <div id="root"></div>
+   </body>
+</html>
+```
+
 ## 🤔 How does it work?
 
 The way `vite-express` works is quite simple. As soon as you invoke `ViteExpress.listen`:
@@ -179,9 +234,10 @@ ViteExpress.config({ /*...*/ });
 
 #### 🔧 Available options
 
-| name | description                                                                                                                         | default       | valid values                |
-| ---- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------- | --------------------------- |
-| mode | When set to development Vite Dev Server will be utilized, in production app will serve static files built with `vite build` command | `development` | `development`, `production` |
+| name        | description                                                                                                                                                                                                                                                                             | default         | valid values                                            |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------- |
+| mode        | When set to development Vite Dev Server will be utilized, in production app will serve static files built with `vite build` command                                                                                                                                                     | `"development"` | `"development"` \| `"production"`                       |
+| transformer | A function used to transform HTML served to the client, useful when you want to inject some metadata on the server. First argument is the HTML that is about to be sent to the client, second is the [`Request`][express-request] object. Needs to return transformed HTML as a string. | `undefined`     | `undefined` \| `(html: string, req: Request) => string` |
 
 ### `listen(app, port, callback?) => http.Server`
 
@@ -247,3 +303,5 @@ ViteExpress.build();
 ## ⚖️ License <!-- omit in toc -->
 
 [MIT](LICENSE)
+
+[express-request]: https://expressjs.com/en/api.html#req

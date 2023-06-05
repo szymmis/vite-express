@@ -13,6 +13,9 @@ const Config = {
   mode: (NODE_ENV === "production" ? "production" : "development") as
     | "production"
     | "development",
+  transformer: undefined as
+    | undefined
+    | ((html: string, req: express.Request) => string),
 };
 type ConfigurationOptions = Partial<Omit<typeof Config, "viteServerSecure">>;
 
@@ -27,6 +30,10 @@ function info(msg: string) {
 
 function isStaticFilePath(path: string) {
   return path.match(/(\.\w+$)|@vite|@id|@react-refresh/);
+}
+
+function getTransformedHTML(html: string, req: express.Request) {
+  return Config.transformer ? Config.transformer(html, req) : html;
 }
 
 async function serveStatic(): Promise<RequestHandler> {
@@ -77,7 +84,10 @@ async function injectViteIndexMiddleware(
 
   app.get("/*", async (req, res, next) => {
     if (isStaticFilePath(req.path)) next();
-    else res.send(await server.transformIndexHtml(req.originalUrl, template));
+    else {
+      const html = await server.transformIndexHtml(req.originalUrl, template);
+      res.send(getTransformedHTML(html, req));
+    }
   });
 }
 
@@ -85,8 +95,10 @@ async function injectIndexMiddleware(app: core.Express) {
   const config = await Vite.resolveConfig({}, "build");
   const distPath = path.resolve(config.root, config.build.outDir);
 
-  app.use("*", (_, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  const html = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
+
+  app.use("*", (req, res) => {
+    res.send(getTransformedHTML(html, req));
   });
 }
 
@@ -103,6 +115,7 @@ async function startServer(server: http.Server | https.Server) {
 
 function config(config: ConfigurationOptions) {
   if (config.mode !== undefined) Config.mode = config.mode;
+  Config.transformer = config.transformer;
 }
 
 async function bind(
