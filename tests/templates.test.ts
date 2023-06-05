@@ -27,9 +27,9 @@ for (const template of templates) {
     process.chdir(`create-vite-express/templates/${template}`);
     await installYarn();
 
+    ViteExpress.config({ inlineViteConfig: undefined });
     await ViteExpress.build();
 
-    ViteExpress.config({ inlineViteConfig: undefined });
     await testCase(template, done);
   });
 
@@ -37,6 +37,8 @@ for (const template of templates) {
     process.chdir(`create-vite-express/templates/${template}`);
 
     ViteExpress.config({ inlineViteConfig: {} });
+    await ViteExpress.build();
+
     await testCase(template, done);
   });
 
@@ -45,11 +47,12 @@ for (const template of templates) {
 
     ViteExpress.config({
       inlineViteConfig: {
-        root: process.cwd(),
-        base: "/",
-        build: { outDir: "dist" },
+        base: "/admin",
+        build: { outDir: "out" },
       },
     });
+    await ViteExpress.build();
+
     await testCase(template, done);
   });
 }
