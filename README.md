@@ -13,6 +13,8 @@
 - [🤔 How does it work?](#-how-does-it-work)
 - [📝 Documentation](#-documentation)
 
+> 🕑 Click [here](https://github.com/szymmis/vite-express/blob/master/CHANGELOG.md) to see the changelog
+
 ## 💬 Introduction <!-- omit in toc -->
 
 With [Vite](https://vitejs.dev/) you can easily bootstrap your project and just start working without figuring everything out. That's great for front-end apps, but when you want to include server-side into the mix, things get quite complicated. Thanks to **vite-express** you can just as easily start writing full-stack app in seconds.
