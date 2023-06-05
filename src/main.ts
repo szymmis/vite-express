@@ -137,13 +137,18 @@ async function injectIndexMiddleware(app: core.Express) {
 }
 
 async function startServer(server: http.Server | https.Server) {
-  const { createServer } = await import("vite");
+  const { createServer, mergeConfig } = await import("vite");
 
-  const vite = await createServer({
-    clearScreen: false,
-    appType: "custom",
-    server: { middlewareMode: true },
-  });
+  const config = Config.inlineViteConfig ? await resolveConfig() : {};
+
+  const vite = await createServer(
+    mergeConfig(config, {
+      clearScreen: false,
+      appType: "custom",
+      server: { middlewareMode: true },
+    })
+  );
+
   server.on("close", () => vite.close());
 
   return vite;
