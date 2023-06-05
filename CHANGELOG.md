@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.1 (2023-06-05)
+
+- Load HTML on every request
+- Merge custom config with inline Vite's config when starting dev server
+
 ## 0.9.0 (2023-06-05)
 
 - Allow specyfing HTML transformer ([#65](https://github.com/szymmis/vite-express/pull/65))
