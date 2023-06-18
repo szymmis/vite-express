@@ -273,7 +273,6 @@ ViteExpress.config({ /*...*/ });
 
 #### 🔧 Available options
 
-<<<<<<< HEAD
 | name             | description                                                                                                                                                                                                                                                                             | default         | valid values                                            |
 | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------- |
 | mode             | When set to development Vite Dev Server will be utilized, in production app will serve static files built with `vite build` command                                                                                                                                                     | `"development"` | `"development"` \| `"production"`                       |
