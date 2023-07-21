@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.2 (2023-07-21)
+
+- Use export assignment syntax in types declaration ([#74](https://github.com/szymmis/vite-express/pull/73))
+- Bump word-wrap from 1.2.3 to 1.2.4 ([#73](https://github.com/szymmis/vite-express/pull/73))
+- Bump vite from 4.0.4 to 4.0.5 ([#66](https://github.com/szymmis/vite-express/pull/66))
+
 ## 0.9.1 (2023-06-05)
 
 - Load HTML on every request
