@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "concurrently -i -P \"sh scripts/dev.sh {1}\" \"yarn build --watch\" --",
     "build": "rollup --config rollup.config.js --bundleConfigAsCjs",
+    "postbuild": "sed -i \"s/export default _default/export = _default/\" dist/main.d.ts",
     "test": "ts-node tests/index.test.ts",
     "test:local": "LOCAL_BUILD_TEST=true ts-node tests/index.test.ts",
     "format": "prettier --write --loglevel silent",
