@@ -20,6 +20,7 @@ const Config = {
     | "production"
     | "development",
   inlineViteConfig: undefined as ViteConfig | undefined,
+  viteExcludePattern: undefined as RegExp | undefined,
   transformer: undefined as
     | undefined
     | ((html: string, req: express.Request) => string),
@@ -112,8 +113,10 @@ async function injectViteIndexMiddleware(
   server: ViteDevServer
 ) {
   const config = await resolveConfig();
+  const viteExcludePattern = Config.viteExcludePattern;
 
   app.get("/*", async (req, res, next) => {
+    if (viteExcludePattern && req.path.match(viteExcludePattern)) return;
     const template = fs.readFileSync(
       path.resolve(config.root, "index.html"),
       "utf8"
@@ -129,8 +132,10 @@ async function injectViteIndexMiddleware(
 
 async function injectIndexMiddleware(app: core.Express) {
   const distPath = await getDistPath();
+  const viteExcludePattern = Config.viteExcludePattern;
 
   app.use("*", (req, res) => {
+    if (viteExcludePattern && req.path.match(viteExcludePattern)) return;
     const html = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
 
     res.send(getTransformedHTML(html, req));
@@ -157,6 +162,7 @@ async function startServer(server: http.Server | https.Server) {
 
 function config(config: ConfigurationOptions) {
   if (config.mode !== undefined) Config.mode = config.mode;
+  Config.viteExcludePattern = config.viteExcludePattern;
   Config.inlineViteConfig = config.inlineViteConfig;
   Config.transformer = config.transformer;
 }
