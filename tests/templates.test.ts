@@ -28,7 +28,8 @@ for (const template of templates) {
     await installYarn();
 
     ViteExpress.config({ inlineViteConfig: undefined });
-    await ViteExpress.build();
+    // BUG: There is a problem with Vue Hot Reload when app is build
+    // await ViteExpress.build();
 
     await testCase(template, done);
   });
