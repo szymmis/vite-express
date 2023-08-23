@@ -152,22 +152,11 @@ You have these options to achieve that
 
 ### ⚡ Viteless mode
 
- `vite-express` uses Vite even in production to resolve [`vite.config.js`][vite-config] correctly. If you want to be able to run your production app without Vite and all development dependencies, you need to specify custom inline config using `ViteExpress.config({ inlineViteConfig: ... })`.
+ `vite-express` will always try to use `Vite` to resolve [`vite.config.*s`][vite-config] file. But in production environment it is very possible that it will not be installed. When `Vite` package cannot be used, `vite-express` falls back to reading the config file as a plain text file, trying to extract [`root`][root], [`base`][base] and [`outDir`][outDir] values. If you don't want to ship `vite.config` to production you can specify custom inline config using [`ViteExpress.config({ inlineViteConfig: ... })`](https://github.com/szymmis/vite-express/tree/feature/running-viteless#configoptions--void). Remember that when using inline config there are two sources of truth, so you need to make sure `vite.config` used by Vite, and inline config used by `vite-express` are synchronized.
 
-Valid configuration values used by `vite-express` are [`root`][root], [`base`][base] and [`outDir`][outDir].
+ Order of config file resolve process:
 
-- When `inlineViteConfig` is set to `undefined` (by default) Vite is used in production to resolve config file
-- To use viteless mode with the defaults you can set `inlineViteConfig` as `{}`
-
-   ```javascript
-   import express from "express";
-   import ViteExpress from "vite-express";
-
-   ViteExpress.config({ inlineViteConfig: {} })
-   ViteExpress.listen(express(), 3000);
-   ```
-
-- You can also specify any combination of valid parameters
+1. When `inlineViteConfig` is set to some value it will be used as a configuration object, completely ignoring `vite.config` file.
 
    ```javascript
    import express from "express";
@@ -183,9 +172,17 @@ Valid configuration values used by `vite-express` are [`root`][root], [`base`][b
    ViteExpress.listen(express(), 3000);
    ```
 
-Be aware that in viteless mode you have two separate sources of truth - `vite.config.js` and your inline configuration, so you need to manually keep them in sync.
+   You can specify any combination of those values, it will be merged with the default values to get resulting configuration object.
 
-Most of the time you are okay with using Vite in production as it's easier, this approach is only recommended if you want to reduce production dependencies.
+   Default config values are:
+
+   - `root = process.cwd()`
+   - `base = /`
+   - `outDir = dist`
+
+2. When `inlineViteConfig` is not defined, `vite-express` will try to use `Vite` to resolve the config.
+3. If the package is not present, `vite.config.*s` file will be loaded as a plain file and config values will be extracted using plain text manipulation methods. That's why `root`, `base` and `outDir` need to be defined as json valid values: strings.
+4. If config file cannot be used to extract the values, defaults defined above will be used.
 
 ## 🤖 Transforming HTML
 

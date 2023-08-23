@@ -23,10 +23,6 @@
   "dependencies": {
     "picocolors": "^1.0.0"
   },
-  "peerDependencies": {
-    "express": "^4.18.2",
-    "vite": "^4.0.0"
-  },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.2.0",
     "@rollup/plugin-typescript": "^10.0.1",
