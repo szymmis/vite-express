@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.0 (2023-08-24)
+
+- Enable resolving config without Vite ([#83](https://github.com/szymmis/vite-express/pull/83))
+- Add config option to ignore paths ([#84](https://github.com/szymmis/vite-express/pull/84))
+
 ## 0.9.2 (2023-07-21)
 
 - Use export assignment syntax in types declaration ([#74](https://github.com/szymmis/vite-express/pull/73))
