@@ -7,23 +7,29 @@ import path from "path";
 import pc from "picocolors";
 import type { ViteDevServer } from "vite";
 
-const { NODE_ENV } = process.env;
-
 type ViteConfig = {
-  root?: string;
-  base?: string;
-  build?: { outDir: string };
+  root: string;
+  base: string;
+  build: { outDir: string };
 };
 
+const _State = {
+  viteConfig: undefined as ViteConfig | undefined,
+};
+
+function clearState() {
+  _State.viteConfig = undefined;
+}
+
 const Config = {
-  mode: (NODE_ENV === "production" ? "production" : "development") as
-    | "production"
-    | "development",
-  inlineViteConfig: undefined as ViteConfig | undefined,
+  mode: (process.env.NODE_ENV === "production"
+    ? "production"
+    : "development") as "production" | "development",
+  inlineViteConfig: undefined as Partial<ViteConfig> | undefined,
   ignorePaths: undefined as
+    | undefined
     | RegExp
-    | ((path: string, req: express.Request) => boolean)
-    | undefined,
+    | ((path: string, req: express.Request) => boolean),
   transformer: undefined as
     | undefined
     | ((html: string, req: express.Request) => string),
@@ -48,27 +54,93 @@ function getTransformedHTML(html: string, req: express.Request) {
   return Config.transformer ? Config.transformer(html, req) : html;
 }
 
-function isRunningViteless() {
-  return Config.inlineViteConfig !== undefined;
+function getDefaultViteConfig(): ViteConfig {
+  return {
+    root: process.cwd(),
+    base: "/",
+    build: { outDir: "dist" },
+  };
 }
 
-async function resolveConfig() {
-  if (!Config.inlineViteConfig) {
-    const { resolveConfig } = await import("vite");
-    return resolveConfig({}, "build");
+function getViteConfigPath() {
+  if (fs.existsSync("vite.config.js")) return "vite.config.js";
+  else if (fs.existsSync("vite.config.ts")) return "vite.config.ts";
+  throw new Error("Unable to locate Vite config");
+}
+
+async function resolveConfig(): Promise<ViteConfig> {
+  if (Config.inlineViteConfig) {
+    info(
+      `${pc.yellow("Inline config")} detected, ignoring ${pc.yellow(
+        "Vite config file"
+      )}`
+    );
+
+    return {
+      ...getDefaultViteConfig(),
+      ...Config.inlineViteConfig,
+    };
   }
 
-  const {
-    root = process.cwd(),
-    base = "/",
-    build = { outDir: "dist" },
-  } = Config.inlineViteConfig;
+  try {
+    const { resolveConfig } = await import("vite");
+    try {
+      const config = await resolveConfig({}, "build");
+      info(
+        `Using ${pc.yellow("Vite")} to resolve the ${pc.yellow("config file")}`
+      );
+      return config;
+    } catch (e) {
+      console.error(e);
+      info(
+        pc.red(
+          `Unable to use ${pc.yellow("Vite")}, running in ${pc.yellow(
+            "viteless"
+          )} mode`
+        )
+      );
+    }
+  } catch (e) {
+    1;
+  }
 
-  return { root, base, build };
+  try {
+    const config = fs.readFileSync(getViteConfigPath(), "utf8");
+
+    const root = config.match(/"?root"?\s*:\s*"([^"]+)"/)?.[1];
+    const base = config.match(/"?base"?\s*:\s*"([^"]+)"/)?.[1];
+    const outDir = config.match(/"?outDir"?\s*:\s*"([^"]+)"/)?.[1];
+
+    const defaultConfig = getDefaultViteConfig();
+
+    return {
+      root: root ?? defaultConfig.root,
+      base: base ?? defaultConfig.base,
+      build: { outDir: outDir ?? defaultConfig.build.outDir },
+    };
+  } catch (e) {
+    info(
+      pc.red(
+        `Unable to locate ${pc.yellow(
+          "vite.config.*s file"
+        )}, using default options`
+      )
+    );
+
+    return getDefaultViteConfig();
+  }
+}
+
+async function getViteConfig(): Promise<ViteConfig> {
+  if (!_State.viteConfig) {
+    _State.viteConfig = await resolveConfig();
+  }
+
+  return _State.viteConfig;
 }
 
 async function getDistPath() {
-  const config = await resolveConfig();
+  const config = await getViteConfig();
   return path.resolve(config.root, config.build.outDir);
 }
 
@@ -95,9 +167,8 @@ async function injectStaticMiddleware(
   app: core.Express,
   middleware: RequestHandler
 ) {
-  const config = await resolveConfig();
-  const base = config.base || "/";
-  app.use(base, middleware);
+  const config = await getViteConfig();
+  app.use(config.base, middleware);
 
   const stubMiddlewareLayer = app._router.stack.find(
     (layer: { handle?: RequestHandler }) => layer.handle === stubMiddleware
@@ -123,7 +194,7 @@ async function injectViteIndexMiddleware(
   app: core.Express,
   server: ViteDevServer
 ) {
-  const config = await resolveConfig();
+  const config = await getViteConfig();
 
   app.get("/*", async (req, res, next) => {
     if (isIgnoredPath(req.path, req)) return next();
@@ -156,10 +227,11 @@ async function injectIndexMiddleware(app: core.Express) {
 async function startServer(server: http.Server | https.Server) {
   const { createServer, mergeConfig } = await import("vite");
 
-  const config = Config.inlineViteConfig ? await resolveConfig() : {};
+  const config = await getViteConfig();
+  const isUsingViteResolvedConfig = Object.entries(config).length > 3;
 
   const vite = await createServer(
-    mergeConfig(config, {
+    mergeConfig(isUsingViteResolvedConfig ? {} : config, {
       clearScreen: false,
       appType: "custom",
       server: { middlewareMode: true },
@@ -185,17 +257,13 @@ async function bind(
 ) {
   info(`Running in ${pc.yellow(Config.mode)} mode`);
 
+  clearState();
+
   if (Config.mode === "development") {
     const vite = await startServer(server);
     await injectStaticMiddleware(app, vite.middlewares);
     await injectViteIndexMiddleware(app, vite);
   } else {
-    if (isRunningViteless()) {
-      info(
-        `Custom inline config defined, running in ${pc.yellow("viteless")} mode`
-      );
-    }
-
     await injectStaticMiddleware(app, await serveStatic());
     await injectIndexMiddleware(app);
   }
