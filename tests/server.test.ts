@@ -221,4 +221,45 @@ test("Express app with transformer function", async (done) => {
   });
 });
 
+test("Express app with ignored paths", async (done) => {
+  process.chdir(path.join(__dirname, "env"));
+
+  const app = express();
+
+  ViteExpress.config({ ignorePaths: /ignored/ });
+
+  const server = ViteExpress.listen(app, 3000, async () => {
+    let response = await request(app).get("/");
+    expect(response.text).toMatch(/<body>/);
+    response = await request(app).get("/route");
+    expect(response.text).toMatch(/<body>/);
+
+    it("html is served correctly");
+
+    response = await request(app).get("/ignored");
+    expect(response.text).toMatch(/Cannot GET \/ignored/);
+
+    it("regex ignore is respected");
+
+    ViteExpress.config({ ignorePaths: (path) => path === "/fnignored" });
+
+    response = await request(app).get("/fnignored");
+    expect(response.text).toMatch(/Cannot GET \/fnignored/);
+    response = await request(app).get("/ignored");
+    expect(response.text).toMatch(/index/);
+
+    it("fn ignore is respected");
+
+    response = await request(app).get("/test.txt");
+    expect(response.text).toBe("Hello from test.txt");
+
+    it("static files are served correctly");
+
+    server.close(() => {
+      process.chdir(baseDir);
+      done();
+    });
+  });
+});
+
 run();
