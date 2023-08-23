@@ -20,6 +20,10 @@ const Config = {
     | "production"
     | "development",
   inlineViteConfig: undefined as ViteConfig | undefined,
+  ignorePaths: undefined as
+    | RegExp
+    | ((path: string, req: express.Request) => boolean)
+    | undefined,
   transformer: undefined as
     | undefined
     | ((html: string, req: express.Request) => string),
@@ -107,6 +111,14 @@ async function injectStaticMiddleware(
   }
 }
 
+function isIgnoredPath(path: string, req: express.Request) {
+  if (Config.ignorePaths === undefined) return false;
+
+  return Config.ignorePaths instanceof RegExp
+    ? path.match(Config.ignorePaths)
+    : Config.ignorePaths(path, req);
+}
+
 async function injectViteIndexMiddleware(
   app: core.Express,
   server: ViteDevServer
@@ -114,6 +126,8 @@ async function injectViteIndexMiddleware(
   const config = await resolveConfig();
 
   app.get("/*", async (req, res, next) => {
+    if (isIgnoredPath(req.path, req)) return next();
+
     const template = fs.readFileSync(
       path.resolve(config.root, "index.html"),
       "utf8"
@@ -130,7 +144,9 @@ async function injectViteIndexMiddleware(
 async function injectIndexMiddleware(app: core.Express) {
   const distPath = await getDistPath();
 
-  app.use("*", (req, res) => {
+  app.use("*", (req, res, next) => {
+    if (isIgnoredPath(req.path, req)) return next();
+
     const html = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
 
     res.send(getTransformedHTML(html, req));
@@ -157,6 +173,7 @@ async function startServer(server: http.Server | https.Server) {
 
 function config(config: ConfigurationOptions) {
   if (config.mode !== undefined) Config.mode = config.mode;
+  Config.ignorePaths = config.ignorePaths;
   Config.inlineViteConfig = config.inlineViteConfig;
   Config.transformer = config.transformer;
 }
