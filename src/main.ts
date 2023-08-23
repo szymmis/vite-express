@@ -145,7 +145,7 @@ async function injectIndexMiddleware(app: core.Express) {
   const distPath = await getDistPath();
 
   app.use("*", (req, res, next) => {
-    if (isIgnoredPath(req.path, req)) return next();
+    if (isIgnoredPath(req.baseUrl, req)) return next();
 
     const html = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
 
