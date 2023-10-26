@@ -190,6 +190,10 @@ function isIgnoredPath(path: string, req: express.Request) {
     : Config.ignorePaths(path, req);
 }
 
+function getBasePath(path: string): string {
+  return path.slice(0, path.lastIndexOf("/"));
+}
+
 async function injectViteIndexMiddleware(
   app: core.Express,
   server: ViteDevServer
@@ -202,8 +206,9 @@ async function injectViteIndexMiddleware(
     if (isStaticFilePath(req.path)) next();
     else {
       try {
+        const basePath = getBasePath(req.path);
         const template = fs.readFileSync(
-          path.resolve(config.root, "index.html"),
+          path.join(config.root, basePath, "index.html"),
           "utf8"
         );
         const html = await server.transformIndexHtml(req.originalUrl, template);
@@ -222,8 +227,9 @@ async function injectIndexMiddleware(app: core.Express) {
     if (isIgnoredPath(req.baseUrl, req)) return next();
 
     try {
+      const basePath = getBasePath(req.baseUrl);
       const html = fs.readFileSync(
-        path.resolve(distPath, "index.html"),
+        path.join(distPath, basePath, "index.html"),
         "utf-8"
       );
       res.send(getTransformedHTML(html, req));
