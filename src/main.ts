@@ -199,13 +199,12 @@ async function injectViteIndexMiddleware(
   app.get("/*", async (req, res, next) => {
     if (isIgnoredPath(req.path, req)) return next();
 
-    const template = fs.readFileSync(
-      path.resolve(config.root, "index.html"),
-      "utf8"
-    );
-
     if (isStaticFilePath(req.path)) next();
     else {
+      const template = fs.readFileSync(
+        path.resolve(config.root, "index.html"),
+        "utf8"
+      );
       const html = await server.transformIndexHtml(req.originalUrl, template);
       res.send(getTransformedHTML(html, req));
     }
