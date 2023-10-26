@@ -201,12 +201,16 @@ async function injectViteIndexMiddleware(
 
     if (isStaticFilePath(req.path)) next();
     else {
-      const template = fs.readFileSync(
-        path.resolve(config.root, "index.html"),
-        "utf8"
-      );
-      const html = await server.transformIndexHtml(req.originalUrl, template);
-      res.send(getTransformedHTML(html, req));
+      try {
+        const template = fs.readFileSync(
+          path.resolve(config.root, "index.html"),
+          "utf8"
+        );
+        const html = await server.transformIndexHtml(req.originalUrl, template);
+        res.send(getTransformedHTML(html, req));
+      } catch (e) {
+        res.sendStatus(404);
+      }
     }
   });
 }
@@ -217,9 +221,15 @@ async function injectIndexMiddleware(app: core.Express) {
   app.use("*", (req, res, next) => {
     if (isIgnoredPath(req.baseUrl, req)) return next();
 
-    const html = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
-
-    res.send(getTransformedHTML(html, req));
+    try {
+      const html = fs.readFileSync(
+        path.resolve(distPath, "index.html"),
+        "utf-8"
+      );
+      res.send(getTransformedHTML(html, req));
+    } catch (e) {
+      res.sendStatus(404);
+    }
   });
 }
 
