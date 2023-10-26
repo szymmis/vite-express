@@ -29,11 +29,18 @@ test("Express app", async (done) => {
     it("get api routes work");
 
     response = await request(app).get("/");
-    expect(response.text).toMatch(/<body>/);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
     response = await request(app).get("/route");
-    expect(response.text).toMatch(/<body>/);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
 
     it("html is served correctly");
+
+    response = await request(app).get("/subpath/");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+    response = await request(app).get("/subpath/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+
+    it("subpath html is served correctly");
 
     response = await request(app).get("/test.txt");
     expect(response.text).toBe("Hello from test.txt");
@@ -86,6 +93,13 @@ test("Express app with explicit static middleware", async (done) => {
 
     it("html is served correctly");
 
+    response = await request(app).get("/subpath/");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+    response = await request(app).get("/subpath/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+
+    it("subpath html is served correctly");
+
     expect(response.headers.before).toBe("1");
     expect(response.headers.after).toBe("1");
 
@@ -135,6 +149,13 @@ test("Express app with custom http server", async (done) => {
     expect(response.text).toMatch(/<body>/);
 
     it("html is served correctly");
+
+    response = await request(app).get("/subpath/");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+    response = await request(app).get("/subpath/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+
+    it("subpath html is served correctly");
 
     response = await request(app).get("/test.txt");
     expect(response.text).toBe("Hello from test.txt");
@@ -209,6 +230,17 @@ test("Express app with transformer function", async (done) => {
 
     it("html is transformed correctly");
 
+    response = await request(app).get("/subpath/");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+    response = await request(app).get("/subpath/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+
+    it("subpath html is served correctly");
+
+    expect(response.text).toMatch(/<meta name="test"\/>/);
+
+    it("subpath html is transformed correctly");
+
     response = await request(app).get("/test.txt");
     expect(response.text).toBe("Hello from test.txt");
 
@@ -235,6 +267,13 @@ test("Express app with ignored paths", async (done) => {
     expect(response.text).toMatch(/<body>/);
 
     it("html is served correctly");
+
+    response = await request(app).get("/subpath/");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+    response = await request(app).get("/subpath/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+
+    it("subpath html is served correctly");
 
     response = await request(app).get("/ignored");
     expect(response.text).toMatch(/Cannot GET \/ignored/);
