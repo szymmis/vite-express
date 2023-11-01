@@ -223,17 +223,12 @@ async function injectViteIndexMiddleware(
 
     if (isStaticFilePath(req.path)) next();
     else {
-      try {
-        const basePath = getBasePath(req.path);
-        const template = fs.readFileSync(
-          path.join(config.root, basePath, "index.html"),
-          "utf8"
-        );
-        const html = await server.transformIndexHtml(req.originalUrl, template);
-        res.send(getTransformedHTML(html, req));
-      } catch (e) {
-        res.sendStatus(404);
-      }
+      const indexPath = findClosestIndexToRoot(req.path, config.root);
+      if (indexPath === undefined) return next();
+
+      const template = fs.readFileSync(indexPath, "utf8");
+      const html = await server.transformIndexHtml(req.originalUrl, template);
+      res.send(getTransformedHTML(html, req));
     }
   });
 }
