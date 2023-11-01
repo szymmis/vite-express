@@ -336,4 +336,32 @@ test("Express app with ignored paths", async (done) => {
   });
 });
 
+test("Express with no index at root", async (done) => {
+  const app = express();
+
+  process.chdir(path.join(__dirname, "noIndexEnv"));
+
+  const server = ViteExpress.listen(app, 3000, async () => {
+    // default middleware fallback will respond with 404
+    let response = await request(app).get("/");
+    expect(response.status).toBe(404);
+    response = await request(app).get("/route");
+    expect(response.status).toBe(404);
+    response = await request(app).get("/some/path/route");
+    expect(response.status).toBe(404);
+
+    it("fallback with next middleware if no index found");
+
+    response = await request(app).get("/subpath/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+
+    it("html is served correctly");
+
+    server.close(() => {
+      process.chdir(baseDir);
+      done();
+    });
+  });
+});
+
 run();
