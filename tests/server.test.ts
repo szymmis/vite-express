@@ -42,12 +42,12 @@ test("Express app", async (done) => {
 
     it("subpath html is served correctly");
 
-    response = await request(app).get("/nopath/");
-    expect(response.status).toBe(404);
-    response = await request(app).get("/nopath/route");
-    expect(response.status).toBe(404);
+    response = await request(app).get("/some/path/route");
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    response = await request(app).get("/subpath/to/some/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
 
-    it("no existing indexes response with 404");
+    it("fallback to closest index toward root");
 
     response = await request(app).get("/test.txt");
     expect(response.text).toBe("Hello from test.txt");
@@ -110,12 +110,12 @@ test("Express app with explicit static middleware", async (done) => {
     expect(response.headers.before).toBe("1");
     expect(response.headers.after).toBe("1");
 
-    response = await request(app).get("/nopath/");
-    expect(response.status).toBe(404);
-    response = await request(app).get("/nopath/route");
-    expect(response.status).toBe(404);
+    response = await request(app).get("/some/path/route");
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    response = await request(app).get("/subpath/to/some/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
 
-    it("no existing indexes response with 404");
+    it("fallback to closest index toward root");
 
     response = await request(app).get("/test.txt");
     expect(response.text).toBe("Hello from test.txt");
@@ -171,12 +171,12 @@ test("Express app with custom http server", async (done) => {
 
     it("subpath html is served correctly");
 
-    response = await request(app).get("/nopath/");
-    expect(response.status).toBe(404);
-    response = await request(app).get("/nopath/route");
-    expect(response.status).toBe(404);
+    response = await request(app).get("/some/path/route");
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    response = await request(app).get("/subpath/to/some/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
 
-    it("no existing indexes response with 404");
+    it("fallback to closest index toward root");
 
     response = await request(app).get("/test.txt");
     expect(response.text).toBe("Hello from test.txt");
@@ -262,12 +262,12 @@ test("Express app with transformer function", async (done) => {
 
     it("subpath html is transformed correctly");
 
-    response = await request(app).get("/nopath/");
-    expect(response.status).toBe(404);
-    response = await request(app).get("/nopath/route");
-    expect(response.status).toBe(404);
+    response = await request(app).get("/some/path/route");
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    response = await request(app).get("/subpath/to/some/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
 
-    it("no existing indexes response with 404");
+    it("fallback to closest index toward root");
 
     response = await request(app).get("/test.txt");
     expect(response.text).toBe("Hello from test.txt");
@@ -303,12 +303,12 @@ test("Express app with ignored paths", async (done) => {
 
     it("subpath html is served correctly");
 
-    response = await request(app).get("/nopath/");
-    expect(response.status).toBe(404);
-    response = await request(app).get("/nopath/route");
-    expect(response.status).toBe(404);
+    response = await request(app).get("/some/path/route");
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    response = await request(app).get("/subpath/to/some/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
 
-    it("no existing indexes response with 404");
+    it("fallback to closest index toward root");
 
     response = await request(app).get("/ignored");
     expect(response.text).toMatch(/Cannot GET \/ignored/);
