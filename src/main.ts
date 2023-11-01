@@ -194,6 +194,24 @@ function getBasePath(path: string): string {
   return path.slice(0, path.lastIndexOf("/"));
 }
 
+function findClosestIndexToRoot(
+  reqPath: string,
+  root: string
+): string | undefined {
+  const basePath = getBasePath(reqPath);
+
+  const dirs = basePath.split("/");
+
+  while (dirs.length > 0) {
+    const pathToTest = path.join(root, ...dirs, "index.html");
+    if (fs.existsSync(pathToTest)) {
+      return pathToTest;
+    }
+    dirs.pop();
+  }
+  return undefined;
+}
+
 async function injectViteIndexMiddleware(
   app: core.Express,
   server: ViteDevServer
