@@ -239,16 +239,11 @@ async function injectIndexMiddleware(app: core.Express) {
   app.use("*", (req, res, next) => {
     if (isIgnoredPath(req.baseUrl, req)) return next();
 
-    try {
-      const basePath = getBasePath(req.originalUrl);
-      const html = fs.readFileSync(
-        path.join(distPath, basePath, "index.html"),
-        "utf-8"
-      );
-      res.send(getTransformedHTML(html, req));
-    } catch (e) {
-      res.sendStatus(404);
-    }
+    const indexPath = findClosestIndexToRoot(req.originalUrl, distPath);
+    if (indexPath === undefined) return next();
+
+    const html = fs.readFileSync(indexPath, "utf8");
+    res.send(getTransformedHTML(html, req));
   });
 }
 
