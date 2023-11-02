@@ -190,16 +190,11 @@ function isIgnoredPath(path: string, req: express.Request) {
     : Config.ignorePaths(path, req);
 }
 
-function getBasePath(path: string): string {
-  return path.slice(0, path.lastIndexOf("/"));
-}
-
 function findClosestIndexToRoot(
   reqPath: string,
   root: string
 ): string | undefined {
-  const basePath = getBasePath(reqPath);
-
+  const basePath = reqPath.slice(0, reqPath.lastIndexOf("/"));
   const dirs = basePath.split("/");
 
   while (dirs.length > 0) {
