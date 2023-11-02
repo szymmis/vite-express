@@ -9,6 +9,7 @@
 
 - [📦 Installation \& usage](#-installation--usage)
 - [🚚 Shipping to production](#-shipping-to-production)
+- [📖 Multipage Apps](#-multipage-apps)
 - [🤖 Transforming HTML](#-transforming-html)
 - [🤔 How does it work?](#-how-does-it-work)
 - [📝 Documentation](#-documentation)
@@ -184,6 +185,39 @@ You have these options to achieve that
 3. If the package is not present, `vite.config.*s` file will be loaded as a plain file and config values will be extracted using plain text manipulation methods. That's why `root`, `base` and `outDir` need to be defined as json valid values: strings.
 4. If config file cannot be used to extract the values, defaults defined above will be used.
 
+## 📖 Multipage Apps
+
+With Vite you can have multiple HTML entry points as described [here][vite-multipage].
+From v0.11.0 this feature is also supported by `vite-express`. Your app will automatically load correct `index.html` file when you navigate to path, just like in Vite.
+
+Suppose you have the following source code structure:
+
+```md
+├── package.json
+├── vite.config.js
+├── index.html
+├── main.js
+└── nested
+    ├── index.html
+    ├── nested.js
+    └── subroute
+        └─ index.html
+```
+
+When you navigate to any client-side route `vite-express` tries to find an `index.html` file matching request path as much as it is possible. What is means is that if you go to `/nested/subroute/my/secret/path`, files that `vite-express` will try to render are:
+
+1. `nested/subroute/my/secret/index.html`
+2. `nested/subroute/my/index.html`
+3. `nested/subroute/index.html`
+4. `nested/index.html`
+5. `index.html`
+
+In this case `nested/subroute/index.html` would be picked because that file exist, but in another case it would fall back to `nested/index.html`, and in case of another failure to root `index.html`. As soon as `nested/subroute/my/secret/index.html` will exist in the file structure, it can be used for this request.
+
+Why `nested/subroute/my/secret/path/index.html` isn't considered? Because it needs to have a trailing `/`. That's how Vite is doing it.
+
+Please remember that you still have to [configure `Vite`][vite-multipage] so that it will resolve all these files correctly in its build step.
+
 ## 🤖 Transforming HTML
 
 You can specify transformer function that takes two arguments - HTML as a string and [`Request`][express-request] object - and returns HTML as a string with any string related transformation applied. It can be used to inject your custom metadata on the server-side.
@@ -355,3 +389,4 @@ ViteExpress.build();
 [root]: https://vitejs.dev/config/shared-options.html#root
 [base]: https://vitejs.dev/config/shared-options.html#base
 [outDir]: https://vitejs.dev/config/build-options.html#build-outdir
+[vite-multipage]: https://vitejs.dev/guide/build.html#multi-page-app
