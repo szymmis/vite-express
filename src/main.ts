@@ -190,6 +190,23 @@ function isIgnoredPath(path: string, req: express.Request) {
     : Config.ignorePaths(path, req);
 }
 
+function findClosestIndexToRoot(
+  reqPath: string,
+  root: string
+): string | undefined {
+  const basePath = reqPath.slice(0, reqPath.lastIndexOf("/"));
+  const dirs = basePath.split("/");
+
+  while (dirs.length > 0) {
+    const pathToTest = path.join(root, ...dirs, "index.html");
+    if (fs.existsSync(pathToTest)) {
+      return pathToTest;
+    }
+    dirs.pop();
+  }
+  return undefined;
+}
+
 async function injectViteIndexMiddleware(
   app: core.Express,
   server: ViteDevServer
@@ -199,13 +216,12 @@ async function injectViteIndexMiddleware(
   app.get("/*", async (req, res, next) => {
     if (isIgnoredPath(req.path, req)) return next();
 
-    const template = fs.readFileSync(
-      path.resolve(config.root, "index.html"),
-      "utf8"
-    );
-
     if (isStaticFilePath(req.path)) next();
     else {
+      const indexPath = findClosestIndexToRoot(req.path, config.root);
+      if (indexPath === undefined) return next();
+
+      const template = fs.readFileSync(indexPath, "utf8");
       const html = await server.transformIndexHtml(req.originalUrl, template);
       res.send(getTransformedHTML(html, req));
     }
@@ -218,8 +234,10 @@ async function injectIndexMiddleware(app: core.Express) {
   app.use("*", (req, res, next) => {
     if (isIgnoredPath(req.baseUrl, req)) return next();
 
-    const html = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
+    const indexPath = findClosestIndexToRoot(req.originalUrl, distPath);
+    if (indexPath === undefined) return next();
 
+    const html = fs.readFileSync(indexPath, "utf8");
     res.send(getTransformedHTML(html, req));
   });
 }
