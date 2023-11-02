@@ -215,8 +215,15 @@ When you navigate to any client-side route `vite-express` tries to find an `inde
 In this case `nested/subroute/index.html` would be picked because that file exist, but in another case it would fall back to `nested/index.html`, and in case of another failure to root `index.html`. As soon as `nested/subroute/my/secret/index.html` will exist in the file structure, it can be used for this request.
 
 Why `nested/subroute/my/secret/path/index.html` isn't considered? Because it needs to have a trailing `/`. That's how Vite is doing it.
+If you want, you can always use express [redirect][express-redirect] to add this trailing slash at the end.
 
-Please remember that you still have to [configure `Vite`][vite-multipage] so that it will resolve all these files correctly in its build step.
+```js
+app.get('^nested/subroute/my/secret/path$', (_, res) => {
+   res.redirect("nested/subroute/my/secret/path/")
+});
+```
+
+⚠️ Please remember that you still have to [configure `Vite`][vite-multipage] so that it will resolve all these files correctly in its build step.
 
 ## 🤖 Transforming HTML
 
@@ -385,6 +392,7 @@ ViteExpress.build();
 [MIT](LICENSE)
 
 [express-request]: https://expressjs.com/en/api.html#req
+[express-redirect]: https://expressjs.com/en/api.html#res.redirect
 [vite-config]: https://vitejs.dev/config/
 [root]: https://vitejs.dev/config/shared-options.html#root
 [base]: https://vitejs.dev/config/shared-options.html#base
