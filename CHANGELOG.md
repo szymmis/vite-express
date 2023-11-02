@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.0 (2023-10-02)
+
+- Add support for multipage apps ([#88](https://github.com/szymmis/vite-express/pull/88))
+
 ## 0.10.0 (2023-08-24)
 
 - Enable resolving config without Vite ([#83](https://github.com/szymmis/vite-express/pull/83))
