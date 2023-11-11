@@ -33,6 +33,7 @@ const Config = {
   transformer: undefined as
     | undefined
     | ((html: string, req: express.Request) => string),
+  ignoreBase: true as boolean,
 };
 
 type ConfigurationOptions = Partial<typeof Config>;
@@ -213,7 +214,7 @@ async function injectViteIndexMiddleware(
 ) {
   const config = await getViteConfig();
 
-  app.get("/*", async (req, res, next) => {
+  app.use(Config.ignoreBase ? "/" : config.base, async (req, res, next) => {
     if (isIgnoredPath(req.path, req)) return next();
 
     if (isStaticFilePath(req.path)) next();
@@ -230,11 +231,12 @@ async function injectViteIndexMiddleware(
 
 async function injectIndexMiddleware(app: core.Express) {
   const distPath = await getDistPath();
+  const config = await getViteConfig();
 
-  app.use("*", (req, res, next) => {
-    if (isIgnoredPath(req.baseUrl, req)) return next();
+  app.use(Config.ignoreBase ? "/" : config.base, (req, res, next) => {
+    if (isIgnoredPath(req.path, req)) return next();
 
-    const indexPath = findClosestIndexToRoot(req.originalUrl, distPath);
+    const indexPath = findClosestIndexToRoot(req.path, distPath);
     if (indexPath === undefined) return next();
 
     const html = fs.readFileSync(indexPath, "utf8");
@@ -266,6 +268,7 @@ function config(config: ConfigurationOptions) {
   Config.ignorePaths = config.ignorePaths;
   Config.inlineViteConfig = config.inlineViteConfig;
   Config.transformer = config.transformer;
+  if (config.ignoreBase !== undefined) Config.ignoreBase = config.ignoreBase;
 }
 
 async function bind(
