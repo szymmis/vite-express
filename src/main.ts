@@ -215,6 +215,8 @@ async function injectViteIndexMiddleware(
   const config = await getViteConfig();
 
   app.use(Config.ignoreBase ? "/" : config.base, async (req, res, next) => {
+    if (req.method !== "GET") return next();
+    
     if (isIgnoredPath(req.path, req)) return next();
 
     if (isStaticFilePath(req.path)) next();
