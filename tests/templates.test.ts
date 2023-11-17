@@ -46,25 +46,24 @@ for (const template of templates) {
   test(`Template "${template}" with custom inline config`, async (done) => {
     process.chdir(`create-vite-express/templates/${template}`);
 
+    const base = "/admin";
+
     ViteExpress.config({
-      inlineViteConfig: {
-        base: "/admin",
-        build: { outDir: "out" },
-      },
+      inlineViteConfig: { base, build: { outDir: "out" } },
     });
     await ViteExpress.build();
 
-    await testCase(template, done);
+    await testCase(template, done, base);
   });
 }
 
-const testCase = async (template: string, done: () => void) => {
+const testCase = async (template: string, done: () => void, base = "/") => {
   const server = ViteExpress.listen(express(), 3000, () => {
     const browser = puppeteer.launch();
 
     browser.then(async (browser) => {
       const page = await browser.newPage();
-      await page.goto("http://localhost:3000/admin");
+      await page.goto(`http://localhost:3000${base}`);
 
       it("test set up");
 
