@@ -64,7 +64,7 @@ const testCase = async (template: string, done: () => void) => {
 
     browser.then(async (browser) => {
       const page = await browser.newPage();
-      await page.goto("http://localhost:3000");
+      await page.goto("http://localhost:3000/admin");
 
       it("test set up");
 
