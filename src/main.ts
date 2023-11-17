@@ -33,7 +33,6 @@ const Config = {
   transformer: undefined as
     | undefined
     | ((html: string, req: express.Request) => string),
-  ignoreBase: true as boolean,
 };
 
 type ConfigurationOptions = Partial<typeof Config>;
@@ -214,9 +213,9 @@ async function injectViteIndexMiddleware(
 ) {
   const config = await getViteConfig();
 
-  app.use(Config.ignoreBase ? "/" : config.base, async (req, res, next) => {
+  app.use(config.base, async (req, res, next) => {
     if (req.method !== "GET") return next();
-    
+
     if (isIgnoredPath(req.path, req)) return next();
 
     if (isStaticFilePath(req.path)) next();
@@ -235,7 +234,7 @@ async function injectIndexMiddleware(app: core.Express) {
   const distPath = await getDistPath();
   const config = await getViteConfig();
 
-  app.use(Config.ignoreBase ? "/" : config.base, (req, res, next) => {
+  app.use(config.base, (req, res, next) => {
     if (isIgnoredPath(req.path, req)) return next();
 
     const indexPath = findClosestIndexToRoot(req.path, distPath);
@@ -270,7 +269,6 @@ function config(config: ConfigurationOptions) {
   Config.ignorePaths = config.ignorePaths;
   Config.inlineViteConfig = config.inlineViteConfig;
   Config.transformer = config.transformer;
-  if (config.ignoreBase !== undefined) Config.ignoreBase = config.ignoreBase;
 }
 
 async function bind(
