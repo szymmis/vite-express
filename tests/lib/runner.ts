@@ -63,16 +63,12 @@ export async function expectCommandOutput(
 
     child.stderr?.on("data", (msg) => {
       process.stdout.write(msg);
-      reject(
-        `Process failed with error:\n${String(msg)
-          .trim()
-          .split("\n")
-          .map((line) => `\t${pc.red(line)}`)}`
-      );
     });
 
-    child.on("close", () => {
-      if (matchOutputRegex) {
+    child.on("close", (code) => {
+      if ((code ?? 0) > 0) {
+        reject(`Process "${cmd}" exited with code ${code}`);
+      } else if (matchOutputRegex) {
         reject("Process closed without expected output");
       } else resolve();
     });
