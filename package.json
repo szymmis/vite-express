@@ -41,7 +41,7 @@
     "express": "^4.18.2",
     "husky": "^8.0.3",
     "lint-staged": "^13.1.0",
-    "nodemon": "^2.0.20",
+    "nodemon": "^3.0.1",
     "prettier": "^2.8.3",
     "puppeteer": "^19.6.2",
     "rimraf": "^4.1.2",
