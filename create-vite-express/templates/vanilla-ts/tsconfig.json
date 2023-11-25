@@ -4,7 +4,7 @@
     "useDefineForClassFields": true,
     "module": "CommonJS",
     "lib": ["ESNext", "DOM"],
-    "moduleResolution": "Node10",
+    "moduleResolution": "NodeNext",
     "strict": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
