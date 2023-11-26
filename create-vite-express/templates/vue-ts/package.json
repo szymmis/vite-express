@@ -2,14 +2,15 @@
   "name": "vite-vue-typescript-starter",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "nodemon src/server/main.ts -w src/server",
-    "start": "NODE_ENV=production ts-node src/server/main.ts",
+    "dev": "nodemon -w src/server -x tsx src/server/main.ts",
+    "start": "NODE_ENV=production tsx src/server/main.ts",
     "build": "vite build"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "ts-node": "^10.9.1",
+    "tsx": "^4.4.0",
     "typescript": "^5.3.2",
     "vite-express": "*",
     "vue": "^3.3.8"
