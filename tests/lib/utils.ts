@@ -2,12 +2,12 @@ import { execSync } from "child_process";
 import fs from "fs";
 import colors from "picocolors";
 import { ElementHandle, Page } from "puppeteer";
-import rimraf from "rimraf";
+import { rimraf } from "rimraf";
 
 export const log = {
   test: (msg: string) => {
     process.stdout.write(
-      `${colors.bgYellow(colors.black(colors.bold(" TEST ")))} ${msg}\n`
+      `${colors.bgYellow(colors.black(colors.bold(" TEST ")))} ${msg}\n`,
     );
   },
   it: (msg: string) => {
@@ -15,34 +15,34 @@ export const log = {
   },
   fail: (msg: string) => {
     process.stdout.write(
-      `${colors.bgRed(colors.black(colors.bold(" FAIL ")))} ${msg}\n`
+      `${colors.bgRed(colors.black(colors.bold(" FAIL ")))} ${msg}\n`,
     );
   },
   pass: (msg: string) => {
     process.stdout.write(
-      `${colors.bgGreen(colors.black(colors.bold(" PASS ")))} ${msg}\n`
+      `${colors.bgGreen(colors.black(colors.bold(" PASS ")))} ${msg}\n`,
     );
   },
   summary: (
     hrtime: [number, number],
     passed: number,
     failed: number,
-    total: number
+    total: number,
   ) => {
     process.stdout.write("------------\n");
     if (passed === total) {
       log.pass(
         `${colors.green(`${passed} tests passed`)} in ${colors.gray(
-          Number(hrtime[0] + hrtime[1] / 10 ** 9).toPrecision(5)
-        )}s`
+          Number(hrtime[0] + hrtime[1] / 10 ** 9).toPrecision(5),
+        )}s`,
       );
     } else {
       log.fail(
         `${colors.red(`${failed} failed`)}, ${colors.green(
-          `${passed} passed`
+          `${passed} passed`,
         )} in ${colors.gray(
-          Number(hrtime[0] + hrtime[1] / 10 ** 9).toPrecision(5)
-        )}s `
+          Number(hrtime[0] + hrtime[1] / 10 ** 9).toPrecision(5),
+        )}s `,
       );
     }
     process.stdout.write("------------\n");
@@ -50,7 +50,7 @@ export const log = {
 };
 
 export async function getExecutionTimeSeconds(
-  fn: () => unknown | Promise<unknown>
+  fn: () => unknown | Promise<unknown>,
 ) {
   const t = process.hrtime();
   await fn();
@@ -65,12 +65,12 @@ export async function wait(ms: number) {
 export function replaceStringInFile(
   path: string,
   searchValue: string | RegExp,
-  replaceValue: string
+  replaceValue: string,
 ) {
   fs.writeFileSync(
     path,
     fs.readFileSync(path, "utf-8").replace(searchValue, replaceValue),
-    "utf-8"
+    "utf-8",
   );
 }
 
@@ -80,7 +80,7 @@ export async function getButton(page: Page) {
 }
 
 export async function getButtonText(
-  button: ElementHandle<HTMLButtonElement> | null
+  button: ElementHandle<HTMLButtonElement> | null,
 ) {
   return await button?.evaluate((p) => p.innerText);
 }

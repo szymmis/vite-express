@@ -5,7 +5,7 @@
   "author": "Szymon Miśtal <mistalzaq@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node src/cli.ts",
+    "dev": "tsx src/cli.ts",
     "build": "rollup -c --bundleConfigAsCjs"
   },
   "dependencies": {

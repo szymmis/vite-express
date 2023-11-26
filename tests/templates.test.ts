@@ -59,7 +59,7 @@ for (const template of templates) {
 
 const testCase = async (template: string, done: () => void, base = "/") => {
   const server = ViteExpress.listen(express(), 3000, () => {
-    const browser = puppeteer.launch();
+    const browser = puppeteer.launch({ headless: "new" });
 
     browser.then(async (browser) => {
       const page = await browser.newPage();
@@ -70,7 +70,7 @@ const testCase = async (template: string, done: () => void, base = "/") => {
       replaceStringInFile(
         "./index.html",
         /<title>(.+)<\/title>/,
-        "<title>Test - $1</title>"
+        "<title>Test - $1</title>",
       );
 
       await wait(200);
@@ -82,7 +82,7 @@ const testCase = async (template: string, done: () => void, base = "/") => {
       replaceStringInFile(
         "./index.html",
         /<title>Test - (.+)<\/title>/,
-        "<title>$1</title>"
+        "<title>$1</title>",
       );
 
       await wait(200);

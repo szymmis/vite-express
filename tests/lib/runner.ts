@@ -29,16 +29,16 @@ export function expect<T>(value: T) {
       if (value !== expected)
         throw new TestError(
           `Given value is not equal to the expected one\n\tgiven: ${pc.red(
-            JSON.stringify(value)
-          )}\n\texpected: ${pc.green(JSON.stringify(expected))}`
+            JSON.stringify(value),
+          )}\n\texpected: ${pc.green(JSON.stringify(expected))}`,
         );
     },
     toMatch: (regex: RegExp) => {
       if (!regex.test(String(value)))
         throw new TestError(
           `Given value does not match regex\n\tgiven: ${pc.red(
-            String(value).trim()
-          )}\n\texpected to match: ${pc.green(String(regex))}`
+            String(value).trim(),
+          )}\n\texpected to match: ${pc.green(String(regex))}`,
         );
     },
   };
@@ -46,7 +46,7 @@ export function expect<T>(value: T) {
 
 export async function expectCommandOutput(
   cmd: string,
-  matchOutputRegex?: RegExp[]
+  matchOutputRegex?: RegExp[],
 ) {
   const [command, ...args] = cmd.split(" ");
 
@@ -89,7 +89,9 @@ export async function run() {
       log.test(test.name);
       const time = await getExecutionTimeSeconds(
         () =>
-          new Promise<void>((resolve, reject) => test.fn(resolve).catch(reject))
+          new Promise<void>((resolve, reject) =>
+            test.fn(resolve).catch(reject),
+          ),
       );
       passedTestCount++;
       log.pass(`Done in ${pc.gray(`${time}s`)}`);
@@ -114,9 +116,9 @@ process.on("unhandledRejection", (e) => {
 
 export function runTestFile(
   fileName: string,
-  options?: { mode: "production" | "development" }
+  options?: { mode: "production" | "development" },
 ) {
-  execSync(`ts-node tests/${fileName}`, {
+  execSync(`tsx tests/${fileName}`, {
     stdio: "inherit",
     env: { ...process.env, NODE_ENV: options?.mode ?? "development" },
   });
@@ -127,6 +129,6 @@ function printSummary() {
     process.hrtime(time),
     passedTestCount,
     tests.length - passedTestCount,
-    tests.length
+    tests.length,
   );
 }
