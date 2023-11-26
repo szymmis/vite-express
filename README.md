@@ -110,8 +110,6 @@ Alternatively you can use [`create-vite` package](https://vitejs.dev/guide/#scaf
     ViteExpress.listen(app, 3000, () => console.log("Server is listening..."));
     ```
 
-    ⚠️ For some frameworks like **React**, **Vite** sets the `package.json` `type` field to `module` so you need to use ESModules `import` syntax despite writing a node script. If that's a problem you can freely change the `type` back to `commonjs` as Vite uses `ESModules` for front-end either way!
-
  5. Run the express script
 
     ```bash
