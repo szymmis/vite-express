@@ -41,7 +41,7 @@ async function main() {
   const templatePath = path.join(__dirname, "..", "templates", templateName);
   if (!fs.existsSync(templatePath)) {
     console.error(
-      kolorist.red(`Template ${templateName} at ${templatePath} not found!`)
+      kolorist.red(`Template ${templateName} at ${templatePath} not found!`),
     );
     process.exit(1);
   }
@@ -55,7 +55,7 @@ async function main() {
   fs.copySync(templatePath, projectPath);
   fs.moveSync(
     path.join(projectPath, "_gitignore"),
-    path.join(projectPath, ".gitignore")
+    path.join(projectPath, ".gitignore"),
   );
 
   console.log(`${kolorist.green("✔")} Done! You can start with:`);

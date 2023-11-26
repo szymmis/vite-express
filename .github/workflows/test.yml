@@ -21,4 +21,3 @@ jobs:
           node-version: 20
       - run: yarn install
       - run: yarn test:local
-      

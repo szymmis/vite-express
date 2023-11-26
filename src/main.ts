@@ -41,8 +41,8 @@ function info(msg: string) {
   const timestamp = new Date().toLocaleString("en-US").split(",")[1].trim();
   console.log(
     `${pc.dim(timestamp)} ${pc.bold(pc.cyan("[vite-express]"))} ${pc.green(
-      msg
-    )}`
+      msg,
+    )}`,
   );
 }
 
@@ -72,8 +72,8 @@ async function resolveConfig(): Promise<ViteConfig> {
   if (Config.inlineViteConfig) {
     info(
       `${pc.yellow("Inline config")} detected, ignoring ${pc.yellow(
-        "Vite config file"
-      )}`
+        "Vite config file",
+      )}`,
     );
 
     return {
@@ -87,7 +87,7 @@ async function resolveConfig(): Promise<ViteConfig> {
     try {
       const config = await resolveConfig({}, "build");
       info(
-        `Using ${pc.yellow("Vite")} to resolve the ${pc.yellow("config file")}`
+        `Using ${pc.yellow("Vite")} to resolve the ${pc.yellow("config file")}`,
       );
       return config;
     } catch (e) {
@@ -95,9 +95,9 @@ async function resolveConfig(): Promise<ViteConfig> {
       info(
         pc.red(
           `Unable to use ${pc.yellow("Vite")}, running in ${pc.yellow(
-            "viteless"
-          )} mode`
-        )
+            "viteless",
+          )} mode`,
+        ),
       );
     }
   } catch (e) {
@@ -122,9 +122,9 @@ async function resolveConfig(): Promise<ViteConfig> {
     info(
       pc.red(
         `Unable to locate ${pc.yellow(
-          "vite.config.*s file"
-        )}, using default options`
-      )
+          "vite.config.*s file",
+        )}, using default options`,
+      ),
     );
 
     return getDefaultViteConfig();
@@ -151,8 +151,8 @@ async function serveStatic(): Promise<RequestHandler> {
     info(`${pc.red(`Static files at ${pc.gray(distPath)} not found!`)}`);
     info(
       `${pc.yellow(
-        `Did you forget to run ${pc.bold(pc.green("vite build"))} command?`
-      )}`
+        `Did you forget to run ${pc.bold(pc.green("vite build"))} command?`,
+      )}`,
     );
   } else {
     info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
@@ -165,13 +165,13 @@ const stubMiddleware: RequestHandler = (req, res, next) => next();
 
 async function injectStaticMiddleware(
   app: core.Express,
-  middleware: RequestHandler
+  middleware: RequestHandler,
 ) {
   const config = await getViteConfig();
   app.use(config.base, middleware);
 
   const stubMiddlewareLayer = app._router.stack.find(
-    (layer: { handle?: RequestHandler }) => layer.handle === stubMiddleware
+    (layer: { handle?: RequestHandler }) => layer.handle === stubMiddleware,
   );
 
   if (stubMiddlewareLayer !== undefined) {
@@ -192,7 +192,7 @@ function isIgnoredPath(path: string, req: express.Request) {
 
 function findClosestIndexToRoot(
   reqPath: string,
-  root: string
+  root: string,
 ): string | undefined {
   const basePath = reqPath.slice(0, reqPath.lastIndexOf("/"));
   const dirs = basePath.split("/");
@@ -209,7 +209,7 @@ function findClosestIndexToRoot(
 
 async function injectViteIndexMiddleware(
   app: core.Express,
-  server: ViteDevServer
+  server: ViteDevServer,
 ) {
   const config = await getViteConfig();
 
@@ -256,7 +256,7 @@ async function startServer(server: http.Server | https.Server) {
       clearScreen: false,
       appType: "custom",
       server: { middlewareMode: true },
-    })
+    }),
   );
 
   server.on("close", () => vite.close());
@@ -274,7 +274,7 @@ function config(config: ConfigurationOptions) {
 async function bind(
   app: core.Express,
   server: http.Server | https.Server,
-  callback?: () => void
+  callback?: () => void,
 ) {
   info(`Running in ${pc.yellow(Config.mode)} mode`);
 
