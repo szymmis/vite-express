@@ -261,7 +261,7 @@ async function startServer(server: http.Server | https.Server) {
 
   server.on("close", async () => {
     await vite.close()
-    server.emit("vite-dev-server:closed");
+    server.emit("vite-dev-server:exit");
   });
 
   return vite;
