@@ -255,7 +255,10 @@ async function startServer(server: http.Server | https.Server) {
     mergeConfig(isUsingViteResolvedConfig ? {} : config, {
       clearScreen: false,
       appType: "custom",
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: { server },
+      },
     }),
   );
 
