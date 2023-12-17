@@ -7,5 +7,5 @@ export default {
     format: "cjs",
   },
   external: ["express", "vite", "node-fetch", "fs", "path", "picocolors"],
-  plugins: [typescript({ module: "ESNext" })],
+  plugins: [typescript({ module: "ESNext", include: "src/main.ts" })],
 };
