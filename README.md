@@ -339,7 +339,7 @@ const app = express();
 const httpServer = ViteExpress.listen(app, 3000, () => console.log("Server is listening!"));
 ```
 
-Emits an event (`vite:close`) when the underlying Vite dev server is finished closing, since that happens asynchronously with closing the Express HTTP server.
+When HTTP server has been closed using the `close()` method, vite-express also closes the Vite dev server asynchronously. After that, a `vite:close` event is emitted so you can listen to that event to have a guarantee that all server resources were freed.
 
 ```js
 httpServer.on("vite:close", handleViteClose);
