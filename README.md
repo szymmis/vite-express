@@ -339,6 +339,13 @@ const app = express();
 const httpServer = ViteExpress.listen(app, 3000, () => console.log("Server is listening!"));
 ```
 
+When HTTP server has been closed using the `close()` method, vite-express also closes the Vite dev server asynchronously. After that, a `vite:close` event is emitted so you can listen to that event to have a guarantee that all server resources were freed.
+
+```js
+httpServer.on("vite:close", handleViteClose);
+httpServer.close();
+```
+
 ### `async bind(app, server, callback?) => Promise<void>`
 
 Used to inject necessary middleware into the app, but does not start the listening process. Should be used when you want to create your own `http`/`https` server instance manually e.g. when you use `socket.io` library. Same as `listen`, can be invoked at any time because it is async, but it is advised to invoke it when you already registered all routes and middlewares, so that it can correctly hook into the express app.
