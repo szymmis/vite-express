@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.12.0 (2023-12-20)
+
+- Make Vite middleware use current server for HMR WebSocket ([#100](https://github.com/szymmis/vite-express/pull/100))
+- Emit event when the Vite dev server has finished closing ([#98](https://github.com/szymmis/vite-express/pull/98))
+
 ## 0.11.1 (2023-11-17)
 
 - Mount middlewares that serve HTML at `config.root` instead of `/` ([#91](https://github.com/szymmis/vite-express/pull/91))
