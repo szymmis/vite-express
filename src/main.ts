@@ -26,6 +26,7 @@ const Config = {
     ? "production"
     : "development") as "production" | "development",
   inlineViteConfig: undefined as Partial<ViteConfig> | undefined,
+  viteConfigFile: undefined as string | undefined,
   ignorePaths: undefined as
     | undefined
     | RegExp
@@ -85,7 +86,12 @@ async function resolveConfig(): Promise<ViteConfig> {
   try {
     const { resolveConfig } = await import("vite");
     try {
-      const config = await resolveConfig({}, "build");
+      const config = await resolveConfig(
+        {
+          configFile: Config.viteConfigFile,
+        },
+        "build",
+      );
       info(
         `Using ${pc.yellow("Vite")} to resolve the ${pc.yellow("config file")}`,
       );
@@ -253,6 +259,7 @@ async function startServer(server: http.Server | https.Server) {
 
   const vite = await createServer(
     mergeConfig(isUsingViteResolvedConfig ? {} : config, {
+      configFile: Config.viteConfigFile,
       clearScreen: false,
       appType: "custom",
       server: {
@@ -263,7 +270,7 @@ async function startServer(server: http.Server | https.Server) {
   );
 
   server.on("close", async () => {
-    await vite.close()
+    await vite.close();
     server.emit("vite:close");
   });
 
