@@ -5,13 +5,19 @@
 - Make Vite middleware use current server for HMR WebSocket ([#100](https://github.com/szymmis/vite-express/pull/100))
 - Emit event when the Vite dev server has finished closing ([#98](https://github.com/szymmis/vite-express/pull/98))
 
+Contributors: [@elturpin](https://github.com/elturpin), [@patreeceeo](https://github.com/patreeceeo), [@pontusva](https://github.com/pontusva)
+
 ## 0.11.1 (2023-11-17)
 
 - Mount middlewares that serve HTML at `config.root` instead of `/` ([#91](https://github.com/szymmis/vite-express/pull/91))
 
+Contributors: [@rmhaiderali](https://github.com/rmhaiderali)
+
 ## 0.11.0 (2023-10-02)
 
 - Add support for multipage apps ([#88](https://github.com/szymmis/vite-express/pull/88))
+
+Contributors: [@elturpin](https://github.com/elturpin)
 
 ## 0.10.0 (2023-08-24)
 
@@ -37,6 +43,8 @@
 - Add Vite base support ([#57](https://github.com/szymmis/vite-express/pull/57))
 - Remove `node-fetch` from dependencies
 
+Contributors: [@moonrailgun](https://github.com/moonrailgun)
+
 ## 0.8.0 (2023-05-19)
 
 - Use `Vite Dev Server` in middleware mode when running in development instead of a proxied separate Vite process
@@ -45,6 +53,8 @@
 ## 0.7.1 (2023-05-17)
 
 - Turn off `index.html` serving functionality of `express.static()` middleware in production mode
+
+Contributors: [@Julienng](https://github.com/Julienng)
 
 ## 0.7.0 (2023-05-14)
 
@@ -59,6 +69,8 @@
 - Fix inability to set `ViteExpress.config` settings to falsy values
 - Bump `yaml` package version to avoid vulnerabilities
 
+Contributors: [@tomayac](https://github.com/tomayac)
+
 ## 0.5.4 (2023-04-21)
 
 - Pass request path correctly into HTML serving middleware in dev mode
@@ -72,6 +84,8 @@
 
 - Make `picocolors` a runtime dependency instead of peer dependency.
 
+Contributors: [@mortalYoung](https://github.com/mortalYoung)
+
 ## 0.5.1 (2023-03-24)
 
 - Add `picocolors` as a peer dependency to package.json
@@ -79,3 +93,5 @@
 ## 0.5.0 (2023-03-21)
 
 - Print url schema correctly when Vite is running in https mode
+
+Contributors: [@maxbeatty](https://github.com/maxbeatty), [@hankthetank27](https://github.com/hankthetank27), [@vinceps](https://github.com/vinceps)
