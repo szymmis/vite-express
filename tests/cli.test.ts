@@ -22,6 +22,16 @@ for (const template of templates) {
     await expectCommandOutput("yarn start", [/Running in/, /production/]);
     it("production build works");
 
+    // Vue needs Volar extension to support .vue files correctly in TS LS
+    // https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin
+    // so it's easier to just ignore it
+    if (template.includes("-ts") && !template.includes("vue")) {
+      await expectCommandOutput(
+        "yarn tsc -p src/client/tsconfig.json --noEmit",
+      );
+      it("client passes typecheck");
+    }
+
     process.chdir(baseDir);
     done();
   });
