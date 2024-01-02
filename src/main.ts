@@ -64,7 +64,9 @@ function getDefaultViteConfig(): ViteConfig {
 }
 
 function getViteConfigPath() {
-  if (fs.existsSync("vite.config.js")) return "vite.config.js";
+  if (Config.viteConfigFile && fs.existsSync(Config.viteConfigFile))
+    return Config.viteConfigFile;
+  else if (fs.existsSync("vite.config.js")) return "vite.config.js";
   else if (fs.existsSync("vite.config.ts")) return "vite.config.ts";
   throw new Error("Unable to locate Vite config");
 }
@@ -282,6 +284,7 @@ function config(config: ConfigurationOptions) {
   Config.ignorePaths = config.ignorePaths;
   Config.inlineViteConfig = config.inlineViteConfig;
   Config.transformer = config.transformer;
+  Config.viteConfigFile = config.viteConfigFile;
 }
 
 async function bind(
