@@ -32,7 +32,7 @@ const Config = {
     | ((path: string, req: express.Request) => boolean),
   transformer: undefined as
     | undefined
-    | ((html: string, req: express.Request) => string),
+    | ((html: string, req: express.Request) => string | Promise<string>),
 };
 
 type ConfigurationOptions = Partial<typeof Config>;
@@ -50,7 +50,7 @@ function isStaticFilePath(path: string) {
   return path.match(/(\.\w+$)|@vite|@id|@react-refresh/);
 }
 
-function getTransformedHTML(html: string, req: express.Request) {
+async function getTransformedHTML(html: string, req: express.Request) {
   return Config.transformer ? Config.transformer(html, req) : html;
 }
 
@@ -224,8 +224,16 @@ async function injectViteIndexMiddleware(
       if (indexPath === undefined) return next();
 
       const template = fs.readFileSync(indexPath, "utf8");
-      const html = await server.transformIndexHtml(req.originalUrl, template);
-      res.send(getTransformedHTML(html, req));
+      let html = await server.transformIndexHtml(req.originalUrl, template);
+
+      try {
+        html = await getTransformedHTML(html, req);
+        res.send(html);
+      } catch (e) {
+        console.error(e);
+        res.status(500);
+        return next();
+      }
     }
   });
 }
@@ -234,14 +242,22 @@ async function injectIndexMiddleware(app: core.Express) {
   const distPath = await getDistPath();
   const config = await getViteConfig();
 
-  app.use(config.base, (req, res, next) => {
+  app.use(config.base, async (req, res, next) => {
     if (isIgnoredPath(req.path, req)) return next();
 
     const indexPath = findClosestIndexToRoot(req.path, distPath);
     if (indexPath === undefined) return next();
 
-    const html = fs.readFileSync(indexPath, "utf8");
-    res.send(getTransformedHTML(html, req));
+    let html = fs.readFileSync(indexPath, "utf8");
+
+    try {
+      html = await getTransformedHTML(html, req);
+      res.send(html);
+    } catch (e) {
+      console.error(e);
+      res.status(500);
+      return next();
+    }
   });
 }
 
@@ -263,7 +279,7 @@ async function startServer(server: http.Server | https.Server) {
   );
 
   server.on("close", async () => {
-    await vite.close()
+    await vite.close();
     server.emit("vite:close");
   });
 
