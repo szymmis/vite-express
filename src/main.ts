@@ -26,6 +26,7 @@ const Config = {
     ? "production"
     : "development") as "production" | "development",
   inlineViteConfig: undefined as Partial<ViteConfig> | undefined,
+  viteConfigFile: undefined as string | undefined,
   ignorePaths: undefined as
     | undefined
     | RegExp
@@ -63,7 +64,9 @@ function getDefaultViteConfig(): ViteConfig {
 }
 
 function getViteConfigPath() {
-  if (fs.existsSync("vite.config.js")) return "vite.config.js";
+  if (Config.viteConfigFile && fs.existsSync(Config.viteConfigFile))
+    return Config.viteConfigFile;
+  else if (fs.existsSync("vite.config.js")) return "vite.config.js";
   else if (fs.existsSync("vite.config.ts")) return "vite.config.ts";
   throw new Error("Unable to locate Vite config");
 }
@@ -85,7 +88,12 @@ async function resolveConfig(): Promise<ViteConfig> {
   try {
     const { resolveConfig } = await import("vite");
     try {
-      const config = await resolveConfig({}, "build");
+      const config = await resolveConfig(
+        {
+          configFile: Config.viteConfigFile,
+        },
+        "build",
+      );
       info(
         `Using ${pc.yellow("Vite")} to resolve the ${pc.yellow("config file")}`,
       );
@@ -269,6 +277,7 @@ async function startServer(server: http.Server | https.Server) {
 
   const vite = await createServer(
     mergeConfig(isUsingViteResolvedConfig ? {} : config, {
+      configFile: Config.viteConfigFile,
       clearScreen: false,
       appType: "custom",
       server: {
@@ -291,6 +300,7 @@ function config(config: ConfigurationOptions) {
   Config.ignorePaths = config.ignorePaths;
   Config.inlineViteConfig = config.inlineViteConfig;
   Config.transformer = config.transformer;
+  Config.viteConfigFile = config.viteConfigFile;
 }
 
 async function bind(
