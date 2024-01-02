@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.0 (2024-01-02)
+
+- Add ability to specify location of vite config ([#102](https://github.com/szymmis/vite-express/pull/102))
+- Support async html transformer function ([#103](https://github.com/szymmis/vite-express/pull/103))
+
+Contributors: [@peterlama](https://github.com/peterlama)
+
 ## 0.12.0 (2023-12-20)
 
 - Make Vite middleware use current server for HMR WebSocket ([#100](https://github.com/szymmis/vite-express/pull/100))
