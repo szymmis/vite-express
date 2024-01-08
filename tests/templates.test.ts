@@ -1,122 +1,90 @@
-import express from "express";
 import fs from "fs";
-import puppeteer from "puppeteer";
+import os from "os";
+import path from "path";
+import { describe, test } from "vitest";
 
-import ViteExpress from "../src/main";
-import { expect, it, run, test } from "./lib/runner";
-import {
-  getButton,
-  getButtonText,
-  installYarn,
-  replaceStringInFile,
-  wait,
-} from "./lib/utils";
+import { TEMPLATES } from "../create-vite-express/src/templates";
+import { cmd } from "./libs/utils";
 
-const baseDir = process.cwd();
-const templates = fs.readdirSync("create-vite-express/templates");
+// const TEMPLATES_HMR_FILE_MAP = {
+//   react: "./src/client/App.jsx",
+//   "react-ts": "./src/client/App.tsx",
+//   vue: "./src/client/components/HelloWorld.vue",
+//   "vue-ts": "./src/client/components/HelloWorld.vue",
+// };
 
-const templatesHotReloadTestFileMap: Record<string, string> = {
-  react: "./src/client/App.jsx",
-  "react-ts": "./src/client/App.tsx",
-  vue: "./src/client/components/HelloWorld.vue",
-  "vue-ts": "./src/client/components/HelloWorld.vue",
-};
+const cliPath = path.resolve(__dirname, "../create-vite-express/src/cli.ts");
 
-for (const template of templates) {
-  test(`Template "${template}"`, async (done) => {
-    process.chdir(`create-vite-express/templates/${template}`);
-    await installYarn();
-
-    ViteExpress.config({ inlineViteConfig: undefined });
-    // BUG: There is a problem with Vue Hot Reload when app is build
-    // await ViteExpress.build();
-
-    await testCase(template, done);
+TEMPLATES.forEach((template, i) => {
+  describe(`Template "${template.value}"`, () => {
+    const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), "/"));
+    testCase({ ts: false, templateIndex: i, tmpdir });
   });
 
-  test(`Template "${template}" with default inline config`, async (done) => {
-    process.chdir(`create-vite-express/templates/${template}`);
+  describe(`Template "${template.value}-ts"`, () => {
+    const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), "/"));
+    testCase({ ts: true, templateIndex: i, tmpdir });
+  });
+});
 
-    ViteExpress.config({ inlineViteConfig: {} });
-    await ViteExpress.build();
+const testCase = async ({
+  ts,
+  templateIndex,
+  tmpdir,
+}: {
+  ts: boolean;
+  templateIndex: number;
+  tmpdir: string;
+}) => {
+  console.log(tmpdir);
 
-    await testCase(template, done);
+  test("install template", async () => {
+    return cmd(`tsx ${cliPath}`)
+      .cwd(tmpdir)
+      .write("test")
+      .awaitOutput("Select a framework")
+      .write("\u001b[B".repeat(templateIndex))
+      .awaitOutput("Do you use TypeScript?")
+      .write(ts ? "y" : "n")
+      .awaitOutput("Happy hacking!")
+      .success()
+      .assert();
   });
 
-  test(`Template "${template}" with custom inline config`, async (done) => {
-    process.chdir(`create-vite-express/templates/${template}`);
-
-    const base = "/admin";
-
-    ViteExpress.config({
-      inlineViteConfig: { base, build: { outDir: "out" } },
-    });
-    await ViteExpress.build();
-
-    await testCase(template, done, base);
+  test("rewrite vite-express to local dependency", async () => {
+    return cmd(`npm install ${path.resolve(__dirname, "..")}`)
+      .cwd(path.join(tmpdir, "test"))
+      .success()
+      .assert();
   });
-}
 
-const testCase = async (template: string, done: () => void, base = "/") => {
-  const server = ViteExpress.listen(express(), 3000, () => {
-    const browser = puppeteer.launch({ headless: "new" });
+  test("install dependencies", async () => {
+    return cmd("npm install").cwd(path.join(tmpdir, "test")).success().assert();
+  });
 
-    browser.then(async (browser) => {
-      const page = await browser.newPage();
-      await page.goto(`http://localhost:3000${base}`);
+  test("run app in development mode", async () => {
+    return cmd("npm run dev")
+      .cwd(path.join(tmpdir, "test"))
+      .awaitOutput(["Running in", "development"])
+      .awaitOutput("Server is listening on port 3000...")
+      .close()
+      .assert();
+  });
 
-      it("test set up");
+  test("build app", async () => {
+    return cmd("npm run build")
+      .cwd(path.join(tmpdir, "test"))
+      .success()
+      .stdoutMatches("built in")
+      .assert();
+  });
 
-      replaceStringInFile(
-        "./index.html",
-        /<title>(.+)<\/title>/,
-        "<title>Test - $1</title>",
-      );
-
-      await wait(200);
-
-      let button = await getButton(page);
-      await button?.click();
-      expect(await getButtonText(button)).toBe("count is 1");
-
-      replaceStringInFile(
-        "./index.html",
-        /<title>Test - (.+)<\/title>/,
-        "<title>$1</title>",
-      );
-
-      await wait(200);
-
-      button = await getButton(page);
-      expect(await getButtonText(button)).toBe("count is 0");
-
-      it("automatic page reload works");
-
-      if (templatesHotReloadTestFileMap[template]) {
-        const filePath = templatesHotReloadTestFileMap[template];
-
-        await button?.click();
-        await button?.click();
-
-        replaceStringInFile(filePath, "count is", "button count is");
-        await wait(200);
-        expect(await getButtonText(button)).toBe("button count is 2");
-
-        replaceStringInFile(filePath, "button count is", "count is");
-        await wait(200);
-        expect(await getButtonText(button)).toBe("count is 2");
-
-        it("hot reload works");
-      }
-
-      await browser.close();
-
-      server.close(() => {
-        process.chdir(baseDir);
-        done();
-      });
-    });
+  test("run app in production mode", async () => {
+    return cmd("npm run start")
+      .cwd(path.join(tmpdir, "test"))
+      .awaitOutput(["Running in", "production"])
+      .awaitOutput("Server is listening on port 3000...")
+      .close()
+      .assert();
   });
 };
-
-run();

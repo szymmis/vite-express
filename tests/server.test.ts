@@ -1,375 +1,392 @@
 import express from "express";
 import http from "http";
+import { AddressInfo } from "net";
 import path from "path";
-import SocketIO from "socket.io";
+import * as SocketIO from "socket.io";
 import { io as SocketIOClient } from "socket.io-client";
 import request from "supertest";
+import { beforeAll, describe, expect, test } from "vitest";
 
 import ViteExpress from "../src/main";
-import { expect, it, run, test } from "./lib/runner";
 
-const baseDir = process.cwd();
-
-test("Express app", async (done) => {
-  process.chdir(path.join(__dirname, "env"));
-
+describe("Basic app", () => {
   const app = express();
 
-  app.get("/hello", (_, res) => {
-    res.send("Hello Vite Express!");
+  beforeAll(async () => {
+    process.chdir(path.join(__dirname, "envs/basic"));
+
+    app.get("/hello", (req, res) => {
+      res.send("Hello Vite Express!");
+    });
+
+    await new Promise<void>((done) => {
+      ViteExpress.listen(app, 0, async () => done());
+    });
   });
 
-  const server = ViteExpress.listen(app, 3000, async () => {
-    let response = await request(app).get("/hello");
-    expect(response.text).toBe("Hello Vite Express!");
+  test("get api routes work", async () => {
+    await request(app).get("/hello").expect(200, "Hello Vite Express!");
+  });
 
-    response = await request(app).get("/api");
-    expect(response.text).toBe("Response from API!");
-
-    it("get api routes work");
-
-    response = await request(app).get("/");
+  test("html is served correctly", async () => {
+    let response = await request(app).get("/").expect(200);
     expect(response.text).toMatch(/<h1>index<\/h1>/);
-    response = await request(app).get("/route");
+    response = await request(app).get("/route").expect(200);
     expect(response.text).toMatch(/<h1>index<\/h1>/);
     response = await request(app).get("/index.html");
     expect(response.text).toMatch(/<h1>index<\/h1>/);
     response = await request(app).get("/main.html");
     expect(response.text).toMatch(/<h1>main<\/h1>/);
+  });
 
-    it("html is served correctly");
-
-    response = await request(app).get("/subpath/");
+  test("subpath html is served correctly", async () => {
+    let response = await request(app).get("/subpath/");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
     response = await request(app).get("/subpath/route");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+  });
 
-    it("subpath html is served correctly");
-
-    response = await request(app).get("/some/path/route");
+  test("fallback to closest index towards root", async () => {
+    let response = await request(app).get("/some/path/route");
     expect(response.text).toMatch(/<h1>index<\/h1>/);
     response = await request(app).get("/subpath/to/some/route");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
-
-    it("fallback to closest index toward root");
-
-    response = await request(app).get("/test.txt");
-    expect(response.text).toBe("Hello from test.txt");
-
-    it("static files are served correctly");
-
-    server.close(() => {
-      process.chdir(baseDir);
-      done();
-    });
   });
 
-  app.get("/api", (_, res) => {
-    res.send("Response from API!");
+  test("static files are served correctly", async () => {
+    const response = await request(app).get("/test.txt");
+    expect(response.text).toBe("Hello from test.txt");
   });
 });
 
-test("Express app with explicit static middleware", async (done) => {
-  process.chdir(path.join(__dirname, "env"));
-
+describe("Basic app with explicit static middleware", () => {
   const app = express();
 
-  app.use((_, res, next) => {
-    res.header("before", "1");
-    next();
+  beforeAll(async () => {
+    process.chdir(path.join(__dirname, "envs/basic"));
+
+    app.use((_, res, next) => {
+      res.header("before", "1");
+      next();
+    });
+    app.use(ViteExpress.static());
+    app.use((_, res, next) => {
+      res.header("after", "1");
+      next();
+    });
+    app.get("/hello", (req, res) => {
+      res.send("Hello Vite Express!");
+    });
+
+    await new Promise<void>((done) => {
+      ViteExpress.listen(app, 0, async () => done());
+    });
   });
-  app.use(ViteExpress.static());
-  app.use((_, res, next) => {
-    res.header("after", "1");
-    next();
+
+  test("get api routes work", async () => {
+    await request(app).get("/hello").expect(200, "Hello Vite Express!");
   });
 
-  app.get("/hello", (_, res) => {
-    res.send("Hello Vite Express!");
+  test("html is served correctly", async () => {
+    let response = await request(app).get("/").expect(200);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    response = await request(app).get("/route").expect(200);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
   });
 
-  const server = ViteExpress.listen(app, 3000, async () => {
-    let response = await request(app).get("/hello");
-    expect(response.text).toBe("Hello Vite Express!");
-
-    response = await request(app).get("/api");
-    expect(response.text).toBe("Response from API!");
-
-    it("get api routes work");
-
-    response = await request(app).get("/");
-    expect(response.text).toMatch(/<body>/);
-    response = await request(app).get("/route");
-    expect(response.text).toMatch(/<body>/);
-
-    it("html is served correctly");
-
-    response = await request(app).get("/subpath/");
+  test("subpath html is served correctly", async () => {
+    let response = await request(app).get("/subpath/");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
     response = await request(app).get("/subpath/route");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
-
-    it("subpath html is served correctly");
 
     expect(response.headers.before).toBe("1");
     expect(response.headers.after).toBe("1");
+  });
 
-    response = await request(app).get("/some/path/route");
+  test("fallback to closest index towards root", async () => {
+    let response = await request(app).get("/some/path/route");
     expect(response.text).toMatch(/<h1>index<\/h1>/);
     response = await request(app).get("/subpath/to/some/route");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
-
-    it("fallback to closest index toward root");
-
-    response = await request(app).get("/test.txt");
-    expect(response.text).toBe("Hello from test.txt");
-
-    it("static files are served correctly");
-
-    expect(response.headers.before).toBe("1");
-    expect(response.headers.after).toBe(undefined);
-
-    it("static files middleware respects invocation order");
-
-    server.close(() => {
-      process.chdir(baseDir);
-      done();
-    });
   });
 
-  app.get("/api", (_, res) => {
-    res.send("Response from API!");
+  test("static files are served correctly", async () => {
+    const response = await request(app).get("/test.txt");
+    expect(response.text).toBe("Hello from test.txt");
+  });
+
+  test("static files middleware respects invocation order", async () => {
+    const response = await request(app).get("/test.txt");
+    expect(response.headers.before).toBe("1");
+    expect(response.headers.after).toBe(undefined);
   });
 });
 
-test("Express app with custom http server", async (done) => {
-  process.chdir(path.join(__dirname, "env"));
-
+describe("App with custom http server", () => {
   const app = express();
-  const server = http.createServer(app).listen(3000);
 
-  app.get("/hello", (_, res) => {
-    res.send("Hello Vite Express!");
+  beforeAll(async () => {
+    process.chdir(path.join(__dirname, "envs/basic"));
+
+    const server = http.createServer(app).listen(0);
+
+    app.get("/hello", (_, res) => {
+      res.send("Hello Vite Express!");
+    });
+
+    await new Promise<void>((done) => {
+      ViteExpress.bind(app, server, async () => done());
+    });
   });
 
-  ViteExpress.bind(app, server, async () => {
-    let response = await request(app).get("/hello");
-    expect(response.text).toBe("Hello Vite Express!");
+  test("get api routes work", async () => {
+    await request(app).get("/hello").expect(200, "Hello Vite Express!");
+  });
 
-    response = await request(app).get("/api");
-    expect(response.text).toBe("Response from API!");
+  test("html is served correctly", async () => {
+    let response = await request(app).get("/").expect(200);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    response = await request(app).get("/route").expect(200);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+  });
 
-    it("get api routes work");
-
-    response = await request(app).get("/");
-    expect(response.text).toMatch(/<body>/);
-    response = await request(app).get("/route");
-    expect(response.text).toMatch(/<body>/);
-
-    it("html is served correctly");
-
-    response = await request(app).get("/subpath/");
+  test("subpath html is served correctly", async () => {
+    let response = await request(app).get("/subpath/");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
     response = await request(app).get("/subpath/route");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+  });
 
-    it("subpath html is served correctly");
-
-    response = await request(app).get("/some/path/route");
+  test("fallback to closest index towards root", async () => {
+    let response = await request(app).get("/some/path/route");
     expect(response.text).toMatch(/<h1>index<\/h1>/);
     response = await request(app).get("/subpath/to/some/route");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
-
-    it("fallback to closest index toward root");
-
-    response = await request(app).get("/test.txt");
-    expect(response.text).toBe("Hello from test.txt");
-
-    it("static files are served correctly");
-
-    server.close(() => {
-      process.chdir(baseDir);
-      done();
-    });
   });
 
-  app.get("/api", (_, res) => {
-    res.send("Response from API!");
+  test("static files are served correctly", async () => {
+    const response = await request(app).get("/test.txt");
+    expect(response.text).toBe("Hello from test.txt");
   });
 });
 
-test("Express app with socket.io", async (done) => {
-  process.chdir(path.join(__dirname, "env"));
-
+describe("App with socket.io", () => {
   const app = express();
-  const server = http.createServer(app).listen(3000);
+  const server = http.createServer(app).listen(0);
 
-  const serverSocket = new SocketIO.Server(server);
+  beforeAll(async () => {
+    process.chdir(path.join(__dirname, "envs/basic"));
 
-  serverSocket.on("connection", (socket) => {
-    socket.on("message", () => {
-      socket.emit("response", "Hello from socket.io");
+    const serverSocket = new SocketIO.Server(server);
+
+    serverSocket.on("connection", (socket) => {
+      socket.on("message", () => {
+        socket.emit("response", "Hello from socket.io");
+      });
+    });
+
+    await new Promise<void>((done) => {
+      ViteExpress.bind(app, server, async () => done());
     });
   });
 
-  it("Creates socket.io server");
+  test("emits and receives events", async () => {
+    const client = SocketIOClient(
+      `http://localhost:${(server.address() as AddressInfo).port}`,
+    );
 
-  ViteExpress.bind(app, server, async () => {
-    const client = SocketIOClient("http://localhost:3000");
-
-    client.on("connect", () => {
-      client.emit("message");
-      client.on("response", (response: unknown) => {
-        expect(response).toBe("Hello from socket.io");
-
-        it("Emits and receives events");
-
-        serverSocket.close();
-        server.close(() => {
-          process.chdir(baseDir);
-          done();
+    const response = await new Promise<string>((done) => {
+      client.on("connect", () => {
+        client.emit("message");
+        client.on("response", (response) => {
+          done(response);
         });
       });
     });
+
+    expect(response).toBe("Hello from socket.io");
   });
 });
 
-test("Express app with transformer function", async (done) => {
-  process.chdir(path.join(__dirname, "env"));
-
+describe("App with transformer function", () => {
   const app = express();
 
-  ViteExpress.config({
-    transformer: (html) => html.replace("<head>", '<head><meta name="test"/>'),
-  });
+  beforeAll(async () => {
+    process.chdir(path.join(__dirname, "envs/basic"));
 
-  const server = ViteExpress.listen(app, 3000, async () => {
-    let response = await request(app).get("/");
-    expect(response.text).toMatch(/<body>/);
-    response = await request(app).get("/route");
-    expect(response.text).toMatch(/<body>/);
+    ViteExpress.config({
+      transformer: (html) =>
+        html.replace("<head>", '<head><meta name="test"/>'),
+    });
 
-    it("html is served correctly");
-
-    expect(response.text).toMatch(/<meta name="test"\/>/);
-    response = await request(app).get("/index.html");
-    expect(response.text).toMatch(/<meta name="test"\/>/);
-    response = await request(app).get("/main.html");
-    expect(response.text).toMatch(/<meta name="test"\/>/);
-
-    it("html is transformed correctly");
-
-    response = await request(app).get("/subpath/");
-    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
-    response = await request(app).get("/subpath/route");
-    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
-
-    it("subpath html is served correctly");
-
-    expect(response.text).toMatch(/<meta name="test"\/>/);
-
-    it("subpath html is transformed correctly");
-
-    response = await request(app).get("/some/path/route");
-    expect(response.text).toMatch(/<h1>index<\/h1>/);
-    response = await request(app).get("/subpath/to/some/route");
-    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
-
-    it("fallback to closest index toward root");
-
-    response = await request(app).get("/test.txt");
-    expect(response.text).toBe("Hello from test.txt");
-
-    it("static files are served correctly");
-
-    server.close(() => {
-      process.chdir(baseDir);
-      done();
+    await new Promise<void>((done) => {
+      ViteExpress.listen(app, 0, async () => done());
     });
   });
-});
 
-test("Express app with ignored paths", async (done) => {
-  process.chdir(path.join(__dirname, "env"));
+  test("html is transformed correctly", async () => {
+    let response = await request(app).get("/").expect(200);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    response = await request(app).get("/route").expect(200);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
 
-  const app = express();
+    expect(response.text).toMatch(/<meta name="test"\/>/);
+  });
 
-  ViteExpress.config({ ignorePaths: /ignored/ });
-
-  const server = ViteExpress.listen(app, 3000, async () => {
-    let response = await request(app).get("/");
-    expect(response.text).toMatch(/<body>/);
-    response = await request(app).get("/route");
-    expect(response.text).toMatch(/<body>/);
-
-    it("html is served correctly");
-
-    response = await request(app).get("/subpath/");
+  test("subpath html is transformed correctly", async () => {
+    let response = await request(app).get("/subpath/");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
     response = await request(app).get("/subpath/route");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
 
-    it("subpath html is served correctly");
+    expect(response.text).toMatch(/<meta name="test"\/>/);
+  });
 
-    response = await request(app).get("/some/path/route");
+  test("fallback to closest index towards root", async () => {
+    let response = await request(app).get("/some/path/route");
     expect(response.text).toMatch(/<h1>index<\/h1>/);
     response = await request(app).get("/subpath/to/some/route");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+  });
 
-    it("fallback to closest index toward root");
+  test("static files are served correctly", async () => {
+    const response = await request(app).get("/test.txt");
+    expect(response.text).toBe("Hello from test.txt");
+  });
+});
 
-    response = await request(app).get("/ignored");
+describe("App with async transformer function", () => {
+  const app = express();
+
+  beforeAll(async () => {
+    process.chdir(path.join(__dirname, "envs/basic"));
+
+    ViteExpress.config({
+      transformer: async (html) =>
+        html.replace("<head>", '<head><meta name="test"/>'),
+    });
+
+    await new Promise<void>((done) => {
+      ViteExpress.listen(app, 0, async () => done());
+    });
+  });
+
+  test("html is transformed correctly", async () => {
+    let response = await request(app).get("/").expect(200);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    expect(response.text).toMatch(/<meta name="test"\/>/);
+    response = await request(app).get("/route").expect(200);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    expect(response.text).toMatch(/<meta name="test"\/>/);
+    response = await request(app).get("/index.html");
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    expect(response.text).toMatch(/<meta name="test"\/>/);
+    response = await request(app).get("/main.html");
+    expect(response.text).toMatch(/<h1>main<\/h1>/);
+    expect(response.text).toMatch(/<meta name="test"\/>/);
+  });
+
+  test("subpath html is transformed correctly", async () => {
+    let response = await request(app).get("/subpath/");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+    response = await request(app).get("/subpath/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+
+    expect(response.text).toMatch(/<meta name="test"\/>/);
+  });
+
+  test("fallback to closest index towards root", async () => {
+    let response = await request(app).get("/some/path/route");
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    response = await request(app).get("/subpath/to/some/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+  });
+
+  test("static files are served correctly", async () => {
+    const response = await request(app).get("/test.txt");
+    expect(response.text).toBe("Hello from test.txt");
+  });
+});
+
+describe("App with ignored paths", async () => {
+  const app = express();
+
+  beforeAll(async () => {
+    process.chdir(path.join(__dirname, "envs/basic"));
+
+    ViteExpress.config({
+      ignorePaths: /ignored/,
+    });
+
+    await new Promise<void>((done) => {
+      ViteExpress.listen(app, 0, async () => done());
+    });
+  });
+
+  test("html is served correctly", async () => {
+    let response = await request(app).get("/").expect(200);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    response = await request(app).get("/route").expect(200);
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+  });
+
+  test("subpath html is served correctly", async () => {
+    let response = await request(app).get("/subpath/");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+    response = await request(app).get("/subpath/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+  });
+
+  test("fallback to closest index towards root", async () => {
+    let response = await request(app).get("/some/path/route");
+    expect(response.text).toMatch(/<h1>index<\/h1>/);
+    response = await request(app).get("/subpath/to/some/route");
+    expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+  });
+
+  test("regex ignore is respected", async () => {
+    const response = await request(app).get("/ignored");
     expect(response.text).toMatch(/Cannot GET \/ignored/);
+  });
 
-    it("regex ignore is respected");
-
+  test("function ignore is respected", async () => {
     ViteExpress.config({ ignorePaths: (path) => path === "/fnignored" });
 
-    response = await request(app).get("/fnignored");
+    let response = await request(app).get("/fnignored");
     expect(response.text).toMatch(/Cannot GET \/fnignored/);
     response = await request(app).get("/ignored");
     expect(response.text).toMatch(/index/);
+  });
 
-    it("fn ignore is respected");
-
-    response = await request(app).get("/test.txt");
+  test("static files are served correctly", async () => {
+    const response = await request(app).get("/test.txt");
     expect(response.text).toBe("Hello from test.txt");
-
-    it("static files are served correctly");
-
-    server.close(() => {
-      process.chdir(baseDir);
-      done();
-    });
   });
 });
 
-test("Express with no index at root", async (done) => {
+describe("App with no index at root", async () => {
   const app = express();
 
-  process.chdir(path.join(__dirname, "noIndexEnv"));
+  beforeAll(async () => {
+    process.chdir(path.join(__dirname, "envs/indexless"));
 
-  const server = ViteExpress.listen(app, 3000, async () => {
-    // default middleware fallback will respond with 404
+    await new Promise<void>((done) => {
+      ViteExpress.listen(app, 0, async () => done());
+    });
+  });
+
+  test("fallback with next middleware if no index found", async () => {
     let response = await request(app).get("/");
     expect(response.status).toBe(404);
     response = await request(app).get("/route");
     expect(response.status).toBe(404);
     response = await request(app).get("/some/path/route");
     expect(response.status).toBe(404);
+  });
 
-    it("fallback with next middleware if no index found");
-
-    response = await request(app).get("/subpath/route");
+  test("html is served correctly", async () => {
+    const response = await request(app).get("/subpath/route");
     expect(response.text).toMatch(/<h1>subpath<\/h1>/);
-
-    it("html is served correctly");
-
-    server.close(() => {
-      process.chdir(baseDir);
-      done();
-    });
   });
 });
-
-run();
