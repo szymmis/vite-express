@@ -147,9 +147,10 @@ describe.each(TEMPLATES)(`Template $name`, (template) => {
         server = await cmd("npm run start")
           .cwd(path.join(tmpdir, "test"))
           .awaitOutput(["Running in", "production"])
-          .awaitOutput(
-            `Serving static files from ${path.join(tmpdir, "test", "dist")}`,
-          )
+          .awaitOutput([
+            `Serving static files from`,
+            path.join(tmpdir, "test", "dist"),
+          ])
           .awaitOutput("Server is listening on port 3000...")
           .run();
 
@@ -341,9 +342,10 @@ describe.each(TEMPLATES)(`Template $name`, (template) => {
         server = await cmd("npm run start")
           .cwd(path.join(tmpdir, "test"))
           .awaitOutput(["Running in", "production"])
-          .awaitOutput(
-            `Serving static files from ${path.join(tmpdir, "test", "dist")}`,
-          )
+          .awaitOutput([
+            `Serving static files from`,
+            path.join(tmpdir, "test", "dist"),
+          ])
           .awaitOutput("Server is listening on port 3000...")
           .run();
 
