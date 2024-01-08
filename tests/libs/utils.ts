@@ -247,4 +247,67 @@ class CommandRunBuilder {
       });
     });
   }
+
+  run(): Promise<{
+    process: ChildProcessWithoutNullStreams;
+    close: () => Promise<void>;
+  }> {
+    return new Promise((resolve, reject) => {
+      const proc = spawn(this.command, this.args, {
+        ...this.options,
+        detached: true,
+      });
+
+      process.on("exit", () => {
+        if (proc.pid) process.kill(-proc.pid);
+      });
+
+      proc.stdout?.on("data", (data) => {
+        this.stdout.write(data.toString());
+        if (!this.quiet) console.log(data.toString());
+      });
+      proc.stderr?.on("data", (err) => {
+        this.stderr.write(err.toString());
+        if (!this.quiet) console.error(err.toString());
+      });
+
+      new Promise<void>(() => proc.on("close", () => reject()));
+
+      proc.on("spawn", () => {
+        this.queue.run(proc, () => {
+          resolve({
+            process: proc,
+            close() {
+              return new Promise((resolve) => {
+                process.kill(-proc.pid!);
+                proc.on("exit", () => {
+                  resolve();
+                });
+              });
+            },
+          });
+        });
+      });
+    });
+  }
+}
+
+export function replaceStringInFile(
+  path: string,
+  searchValue: string | RegExp | null,
+  replaceValue: string,
+) {
+  fs.writeFileSync(
+    path,
+    searchValue !== null
+      ? fs.readFileSync(path, "utf-8").replace(searchValue, replaceValue)
+      : replaceValue,
+    "utf-8",
+  );
+}
+
+export async function sleep(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
