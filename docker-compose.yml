@@ -1,0 +1,7 @@
+services:
+  test:
+    image: node:20-slim
+    command: yarn test
+    working_dir: /app
+    volumes:
+      - .:/app
