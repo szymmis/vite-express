@@ -47,10 +47,6 @@ function info(msg: string) {
   );
 }
 
-function isStaticFilePath(path: string) {
-  return path.match(/(\.\w+$)|@vite|@id|@react-refresh/);
-}
-
 async function getTransformedHTML(html: string, req: express.Request) {
   return Config.transformer ? Config.transformer(html, req) : html;
 }
@@ -226,22 +222,19 @@ async function injectViteIndexMiddleware(
 
     if (isIgnoredPath(req.path, req)) return next();
 
-    if (isStaticFilePath(req.path)) next();
-    else {
-      const indexPath = findClosestIndexToRoot(req.path, config.root);
-      if (indexPath === undefined) return next();
+    const indexPath = findClosestIndexToRoot(req.path, config.root);
+    if (indexPath === undefined) return next();
 
-      const template = fs.readFileSync(indexPath, "utf8");
-      let html = await server.transformIndexHtml(req.originalUrl, template);
+    const template = fs.readFileSync(indexPath, "utf8");
+    let html = await server.transformIndexHtml(req.originalUrl, template);
 
-      try {
-        html = await getTransformedHTML(html, req);
-        res.send(html);
-      } catch (e) {
-        console.error(e);
-        res.status(500);
-        return next();
-      }
+    try {
+      html = await getTransformedHTML(html, req);
+      res.send(html);
+    } catch (e) {
+      console.error(e);
+      res.status(500);
+      return next();
     }
   });
 }
