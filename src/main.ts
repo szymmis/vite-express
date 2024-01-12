@@ -172,7 +172,10 @@ async function injectStaticMiddleware(
   middleware: RequestHandler,
 ) {
   const config = await getViteConfig();
-  app.use(config.base, middleware);
+
+  app.use(config.base, (req, res, next) =>
+    req.path.match(/(\.html?|\/)$/) ? next() : middleware(req, res, next),
+  );
 
   const stubMiddlewareLayer = app._router.stack.find(
     (layer: { handle?: RequestHandler }) => layer.handle === stubMiddleware,
@@ -194,6 +197,15 @@ function isIgnoredPath(path: string, req: express.Request) {
     : Config.ignorePaths(path, req);
 }
 
+function getFullPathIfFileExist(
+  reqPath: string,
+  root: string,
+): string | undefined {
+  const pathToTest = path.join(root, reqPath);
+  if (fs.existsSync(pathToTest)) return pathToTest;
+  return undefined;
+}
+
 function findClosestIndexToRoot(
   reqPath: string,
   root: string,
@@ -203,12 +215,14 @@ function findClosestIndexToRoot(
 
   while (dirs.length > 0) {
     const pathToTest = path.join(root, ...dirs, "index.html");
-    if (fs.existsSync(pathToTest)) {
-      return pathToTest;
-    }
+    if (fs.existsSync(pathToTest)) return pathToTest;
     dirs.pop();
   }
   return undefined;
+}
+
+function isHTMLFilePath(path: string) {
+  return path.match(/\.html?$/);
 }
 
 async function injectViteIndexMiddleware(
@@ -222,7 +236,10 @@ async function injectViteIndexMiddleware(
 
     if (isIgnoredPath(req.path, req)) return next();
 
-    const indexPath = findClosestIndexToRoot(req.path, config.root);
+    const indexPath = (
+      isHTMLFilePath(req.path) ? getFullPathIfFileExist : findClosestIndexToRoot
+    )(req.path, config.root);
+
     if (indexPath === undefined) return next();
 
     const template = fs.readFileSync(indexPath, "utf8");
@@ -246,7 +263,10 @@ async function injectIndexMiddleware(app: core.Express) {
   app.use(config.base, async (req, res, next) => {
     if (isIgnoredPath(req.path, req)) return next();
 
-    const indexPath = findClosestIndexToRoot(req.path, distPath);
+    const indexPath = (
+      isHTMLFilePath(req.path) ? getFullPathIfFileExist : findClosestIndexToRoot
+    )(req.path, distPath);
+    
     if (indexPath === undefined) return next();
 
     let html = fs.readFileSync(indexPath, "utf8");
