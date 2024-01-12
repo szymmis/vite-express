@@ -16,7 +16,7 @@ Contributors: [@elturpin](https://github.com/elturpin), [@patreeceeo](https://gi
 
 ## 0.11.1 (2023-11-17)
 
-- Mount middlewares that serve HTML at `config.root` instead of `/` ([#91](https://github.com/szymmis/vite-express/pull/91))
+- Mount middlewares that serve HTML at `config.base` instead of `/` ([#91](https://github.com/szymmis/vite-express/pull/91))
 
 Contributors: [@rmhaiderali](https://github.com/rmhaiderali)
 
