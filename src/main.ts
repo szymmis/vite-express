@@ -174,7 +174,7 @@ async function injectStaticMiddleware(
   const config = await getViteConfig();
 
   app.use(config.base, (req, res, next) =>
-    req.path.match(/(\.html?|\/)$/) ? next() : middleware(req, res, next),
+    req.path.match(/(\.html|\/)$/) ? next() : middleware(req, res, next),
   );
 
   const stubMiddlewareLayer = app._router.stack.find(
@@ -214,11 +214,11 @@ function findClosestIndexToRoot(
 }
 
 function findFilePath(reqPath: string, root: string): string | undefined {
-  if (reqPath.match(/\.html?$/)) {
+  if (reqPath.match(/\.html$/)) {
     const pathToTest = path.join(root, reqPath);
     if (fs.existsSync(pathToTest)) return pathToTest;
   }
-  
+
   return findClosestIndexToRoot(reqPath, root);
 }
 

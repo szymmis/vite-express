@@ -34,7 +34,7 @@ test("Express app", async (done) => {
     expect(response.text).toMatch(/<h1>index<\/h1>/);
     response = await request(app).get("/index.html");
     expect(response.text).toMatch(/<h1>index<\/h1>/);
-    response = await request(app).get("/main.htm");
+    response = await request(app).get("/main.html");
     expect(response.text).toMatch(/<h1>main<\/h1>/);
 
     it("html is served correctly");
@@ -254,7 +254,7 @@ test("Express app with transformer function", async (done) => {
     expect(response.text).toMatch(/<meta name="test"\/>/);
     response = await request(app).get("/index.html");
     expect(response.text).toMatch(/<meta name="test"\/>/);
-    response = await request(app).get("/main.htm");
+    response = await request(app).get("/main.html");
     expect(response.text).toMatch(/<meta name="test"\/>/);
 
     it("html is transformed correctly");
