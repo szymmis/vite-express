@@ -197,15 +197,6 @@ function isIgnoredPath(path: string, req: express.Request) {
     : Config.ignorePaths(path, req);
 }
 
-function getFullPathIfFileExist(
-  reqPath: string,
-  root: string,
-): string | undefined {
-  const pathToTest = path.join(root, reqPath);
-  if (fs.existsSync(pathToTest)) return pathToTest;
-  return undefined;
-}
-
 function findClosestIndexToRoot(
   reqPath: string,
   root: string,
@@ -218,11 +209,17 @@ function findClosestIndexToRoot(
     if (fs.existsSync(pathToTest)) return pathToTest;
     dirs.pop();
   }
+
   return undefined;
 }
 
-function isHTMLFilePath(path: string) {
-  return path.match(/\.html?$/);
+function findFilePath(reqPath: string, root: string): string | undefined {
+  if (reqPath.match(/\.html?$/)) {
+    const pathToTest = path.join(root, reqPath);
+    if (fs.existsSync(pathToTest)) return pathToTest;
+  }
+  
+  return findClosestIndexToRoot(reqPath, root);
 }
 
 async function injectViteIndexMiddleware(
@@ -236,10 +233,7 @@ async function injectViteIndexMiddleware(
 
     if (isIgnoredPath(req.path, req)) return next();
 
-    const indexPath = (
-      isHTMLFilePath(req.path) ? getFullPathIfFileExist : findClosestIndexToRoot
-    )(req.path, config.root);
-
+    const indexPath = findFilePath(req.path, config.root);
     if (indexPath === undefined) return next();
 
     const template = fs.readFileSync(indexPath, "utf8");
@@ -263,10 +257,7 @@ async function injectIndexMiddleware(app: core.Express) {
   app.use(config.base, async (req, res, next) => {
     if (isIgnoredPath(req.path, req)) return next();
 
-    const indexPath = (
-      isHTMLFilePath(req.path) ? getFullPathIfFileExist : findClosestIndexToRoot
-    )(req.path, distPath);
-    
+    const indexPath = findFilePath(req.path, distPath);
     if (indexPath === undefined) return next();
 
     let html = fs.readFileSync(indexPath, "utf8");
