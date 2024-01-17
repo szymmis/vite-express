@@ -104,9 +104,7 @@ async function resolveConfig(): Promise<ViteConfig> {
         ),
       );
     }
-  } catch (e) {
-    1;
-  }
+  } catch (e) {}
 
   try {
     const config = fs.readFileSync(getViteConfigPath(), "utf8");
@@ -174,7 +172,7 @@ async function injectStaticMiddleware(
   const config = await getViteConfig();
 
   app.use(config.base, (req, res, next) =>
-    req.path.match(/(\.html|\/)$/) ? next() : middleware(req, res, next),
+    req.path.endsWith(".html") ? next() : middleware(req, res, next),
   );
 
   const stubMiddlewareLayer = app._router.stack.find(
@@ -197,10 +195,13 @@ function isIgnoredPath(path: string, req: express.Request) {
     : Config.ignorePaths(path, req);
 }
 
-function findClosestIndexToRoot(
-  reqPath: string,
-  root: string,
-): string | undefined {
+function findFilePath(reqPath: string, root: string): string | undefined {
+  if (reqPath.endsWith(".html")) {
+    const pathToTest = path.join(root, reqPath);
+    if (fs.existsSync(pathToTest)) return pathToTest;
+  }
+
+  // find closest index to root
   const basePath = reqPath.slice(0, reqPath.lastIndexOf("/"));
   const dirs = basePath.split("/");
 
@@ -211,15 +212,6 @@ function findClosestIndexToRoot(
   }
 
   return undefined;
-}
-
-function findFilePath(reqPath: string, root: string): string | undefined {
-  if (reqPath.match(/\.html$/)) {
-    const pathToTest = path.join(root, reqPath);
-    if (fs.existsSync(pathToTest)) return pathToTest;
-  }
-
-  return findClosestIndexToRoot(reqPath, root);
 }
 
 async function injectViteIndexMiddleware(
