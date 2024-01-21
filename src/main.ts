@@ -47,10 +47,6 @@ function info(msg: string) {
   );
 }
 
-function isStaticFilePath(path: string) {
-  return path.match(/(\.\w+$)|@vite|@id|@react-refresh/);
-}
-
 async function getTransformedHTML(html: string, req: express.Request) {
   return Config.transformer ? Config.transformer(html, req) : html;
 }
@@ -108,9 +104,7 @@ async function resolveConfig(): Promise<ViteConfig> {
         ),
       );
     }
-  } catch (e) {
-    1;
-  }
+  } catch (e) {}
 
   try {
     const config = fs.readFileSync(getViteConfigPath(), "utf8");
@@ -176,7 +170,10 @@ async function injectStaticMiddleware(
   middleware: RequestHandler,
 ) {
   const config = await getViteConfig();
-  app.use(config.base, middleware);
+
+  app.use(config.base, (req, res, next) =>
+    req.path.endsWith(".html") ? next() : middleware(req, res, next),
+  );
 
   const stubMiddlewareLayer = app._router.stack.find(
     (layer: { handle?: RequestHandler }) => layer.handle === stubMiddleware,
@@ -198,24 +195,29 @@ function isIgnoredPath(path: string, req: express.Request) {
     : Config.ignorePaths(path, req);
 }
 
-function findClosestIndexToRoot(
+function findTemplateFilePath(
   reqPath: string,
   root: string,
 ): string | undefined {
+  if (reqPath.endsWith(".html")) {
+    const pathToTest = path.join(root, reqPath);
+    if (fs.existsSync(pathToTest)) return pathToTest;
+  }
+
+  // find closest index.html to provided path
   const basePath = reqPath.slice(0, reqPath.lastIndexOf("/"));
   const dirs = basePath.split("/");
 
   while (dirs.length > 0) {
     const pathToTest = path.join(root, ...dirs, "index.html");
-    if (fs.existsSync(pathToTest)) {
-      return pathToTest;
-    }
+    if (fs.existsSync(pathToTest)) return pathToTest;
     dirs.pop();
   }
+
   return undefined;
 }
 
-async function injectViteIndexMiddleware(
+async function injectViteHTMLMiddleware(
   app: core.Express,
   server: ViteDevServer,
 ) {
@@ -226,37 +228,34 @@ async function injectViteIndexMiddleware(
 
     if (isIgnoredPath(req.path, req)) return next();
 
-    if (isStaticFilePath(req.path)) next();
-    else {
-      const indexPath = findClosestIndexToRoot(req.path, config.root);
-      if (indexPath === undefined) return next();
+    const templateFilePath = findTemplateFilePath(req.path, config.root);
+    if (templateFilePath === undefined) return next();
 
-      const template = fs.readFileSync(indexPath, "utf8");
-      let html = await server.transformIndexHtml(req.originalUrl, template);
+    const template = fs.readFileSync(templateFilePath, "utf8");
+    let html = await server.transformIndexHtml(req.originalUrl, template);
 
-      try {
-        html = await getTransformedHTML(html, req);
-        res.send(html);
-      } catch (e) {
-        console.error(e);
-        res.status(500);
-        return next();
-      }
+    try {
+      html = await getTransformedHTML(html, req);
+      res.send(html);
+    } catch (e) {
+      console.error(e);
+      res.status(500);
+      return next();
     }
   });
 }
 
-async function injectIndexMiddleware(app: core.Express) {
+async function injectHTMLMiddleware(app: core.Express) {
   const distPath = await getDistPath();
   const config = await getViteConfig();
 
   app.use(config.base, async (req, res, next) => {
     if (isIgnoredPath(req.path, req)) return next();
 
-    const indexPath = findClosestIndexToRoot(req.path, distPath);
-    if (indexPath === undefined) return next();
+    const templateFilePath = findTemplateFilePath(req.path, distPath);
+    if (templateFilePath === undefined) return next();
 
-    let html = fs.readFileSync(indexPath, "utf8");
+    let html = fs.readFileSync(templateFilePath, "utf8");
 
     try {
       html = await getTransformedHTML(html, req);
@@ -315,10 +314,10 @@ async function bind(
   if (Config.mode === "development") {
     const vite = await startServer(server);
     await injectStaticMiddleware(app, vite.middlewares);
-    await injectViteIndexMiddleware(app, vite);
+    await injectViteHTMLMiddleware(app, vite);
   } else {
     await injectStaticMiddleware(app, await serveStatic());
-    await injectIndexMiddleware(app);
+    await injectHTMLMiddleware(app);
   }
 
   callback?.();
