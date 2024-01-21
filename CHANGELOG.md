@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.14.0 (2024-01-21)
+
+- Serve HTML static files on explicit ".html" requests (#110) ([#110](https://github.com/szymmis/vite-express/pull/110))
+- Migrate to `vitest` test runner ([#108](https://github.com/szymmis/vite-express/pull/108))
+
+Contributors: [@rmhaiderali](https://github.com/rmhaiderali)
+
 ## 0.13.0 (2024-01-02)
 
 - Add ability to specify location of vite config ([#102](https://github.com/szymmis/vite-express/pull/102))
