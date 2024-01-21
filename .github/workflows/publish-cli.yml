@@ -5,7 +5,7 @@ on:
       - cli-v*
 jobs:
   test:
-    name: Run tests on npm build
+    name: Run tests on local build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
