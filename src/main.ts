@@ -234,7 +234,11 @@ async function injectViteHTMLMiddleware(
     if (templateFilePath === undefined) return next();
 
     const template = fs.readFileSync(templateFilePath, "utf8");
-    let html = await server.transformIndexHtml(req.originalUrl, template);
+    let html = await server.transformIndexHtml(
+      templateFilePath,
+      template,
+      req.originalUrl,
+    );
 
     try {
       html = await getTransformedHTML(html, req);
