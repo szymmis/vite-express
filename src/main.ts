@@ -104,7 +104,9 @@ async function resolveConfig(): Promise<ViteConfig> {
         ),
       );
     }
-  } catch (e) {}
+  } catch (e) {
+    /* empty */
+  }
 
   try {
     const config = fs.readFileSync(getViteConfigPath(), "utf8");
