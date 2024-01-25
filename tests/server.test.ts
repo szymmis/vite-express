@@ -5,7 +5,7 @@ import path from "path";
 import * as SocketIO from "socket.io";
 import { io as SocketIOClient } from "socket.io-client";
 import request from "supertest";
-import { beforeAll, describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test, vi } from "vitest";
 
 import ViteExpress from "../src/main";
 
@@ -45,10 +45,18 @@ describe.each(["development", "production"] as const)(
       });
 
       test("subpath html is served correctly", async () => {
+        const spyConsolError = vi.spyOn(console, "error");
         let response = await request(app).get("/subpath/");
         expect(response.text).toMatch(/<h1>subpath<\/h1>/);
         response = await request(app).get("/subpath/route");
         expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+        // FIXME: Find a better way to do this
+        // Assert that Vite is not printing pre-transform error to console
+        // when resolving subpath/script.js as a relative import
+        //
+        // https://github.com/szymmis/vite-express/pull/114
+        expect(spyConsolError).not.toHaveBeenCalled();
+        vi.restoreAllMocks();
       });
 
       test("fallback to closest index towards root", async () => {
