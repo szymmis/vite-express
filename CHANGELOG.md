@@ -1,8 +1,14 @@
 # Changelog
 
+## 0.14.1 (2024-01-25)
+
+- Fix relative imports in subpath index.html files ([#114](https://github.com/szymmis/vite-express/pull/114))
+
+Contributors: [@elturpin](https://github.com/elturpin),
+
 ## 0.14.0 (2024-01-21)
 
-- Serve HTML static files on explicit ".html" requests (#110) ([#110](https://github.com/szymmis/vite-express/pull/110))
+- Serve HTML static files on explicit ".html" requests ([#110](https://github.com/szymmis/vite-express/pull/110))
 - Migrate to `vitest` test runner ([#108](https://github.com/szymmis/vite-express/pull/108))
 
 Contributors: [@rmhaiderali](https://github.com/rmhaiderali)
