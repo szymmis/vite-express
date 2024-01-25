@@ -47,10 +47,15 @@ describe.each(["development", "production"] as const)(
       test("subpath html is served correctly", async () => {
         const spyConsolError = vi.spyOn(console, "error");
         let response = await request(app).get("/subpath/");
-        expect(spyConsolError).not.toHaveBeenCalled();
         expect(response.text).toMatch(/<h1>subpath<\/h1>/);
         response = await request(app).get("/subpath/route");
         expect(response.text).toMatch(/<h1>subpath<\/h1>/);
+        // FIXME: Find a better way to do this
+        // Assert that Vite is not printing pre-transform error to console
+        // when resolving subpath/script.js as a relative import
+        //
+        // https://github.com/szymmis/vite-express/pull/114
+        expect(spyConsolError).not.toHaveBeenCalled();
         vi.restoreAllMocks();
       });
 
