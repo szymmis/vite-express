@@ -177,13 +177,21 @@ async function injectStaticMiddleware(
     req.path.endsWith(".html") ? next() : middleware(req, res, next),
   );
 
-  const stubMiddlewareLayer = app._router.stack.find(
+  const router = (() => {
+    try {
+      return app.router;
+    } catch (e) {
+      return app._router;
+    }
+  })();
+
+  const stubMiddlewareLayer = router.stack.find(
     (layer: { handle?: RequestHandler }) => layer.handle === stubMiddleware,
   );
 
   if (stubMiddlewareLayer !== undefined) {
-    const serveStaticLayer = app._router.stack.pop();
-    app._router.stack = app._router.stack.map((layer: unknown) => {
+    const serveStaticLayer = router.stack.pop();
+    router.stack = router.stack.map((layer: unknown) => {
       return layer === stubMiddlewareLayer ? serveStaticLayer : layer;
     });
   }
