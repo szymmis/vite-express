@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.15.0 (2024-02-04)
+
+- Add support for express v5 ([#116](https://github.com/szymmis/vite-express/pull/116))
+
 ## 0.14.1 (2024-01-25)
 
 - Fix relative imports in subpath index.html files ([#114](https://github.com/szymmis/vite-express/pull/114))
