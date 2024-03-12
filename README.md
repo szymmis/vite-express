@@ -398,8 +398,26 @@ ViteExpress.build();
 
 Useful in case you want to write a specific `console.log` message in the listen callback, for example to construct a URL using the base too.
 
+Example:
+
 ```js
-const viteConfig = await ViteExpress.getViteConfig();
+import express from "express";
+import ViteExpress from "vite-express";
+import { handler as apiHandler } from "./api.js";
+
+const listeningPort = 3000;
+const listeningHostname = "localhost";
+
+const expressApp = express();
+expressApp.use(apiHandler);
+const expressServer = expressApp.listen(listeningPort, listeningHostname,
+  async () => {
+    const viteExpressConfig = await ViteExpress.getViteConfig();
+    const appUrl = `http://${listeningHostname}:${listeningPort}${viteExpressConfig.base}`;
+    console.log(`Serving app from root ${viteExpressConfig.root}`);
+    console.log(`App server is listening at ${appUrl}`);
+  });
+ViteExpress.bind(expressApp, expressServer);
 ```
 
 ## ⚖️ License <!-- omit in toc -->
