@@ -296,6 +296,7 @@ Because `ViteExpress.listen` is an async function, in most cases it doesn't matt
 | [`async bind(app, server, callback?) => Promise<void>`](#async-bindapp-server-callback--promisevoid) |
 | [`static() => RequestHandler`](#static--requesthandler)                                              |
 | [`async build() => Promise<void>`](#async-build--promisevoid)                                        |
+| [`async getViteConfig() => Promise<ViteConfig>`](#async-getviteconfig--promiseviteconfig)            |
 
 ---
 
@@ -391,6 +392,14 @@ Used when you want to build the app to production programically. It is adviced t
 
 ```js
 ViteExpress.build();
+```
+
+### `async getViteConfig() => Promise<ViteConfig>`
+
+Useful in case you want to write a specific `console.log` message in the listen callback, for example to construct a URL using the base too.
+
+```js
+const viteConfig = await ViteExpress.getViteConfig();
 ```
 
 ## ⚖️ License <!-- omit in toc -->
