@@ -412,9 +412,9 @@ const expressApp = express();
 expressApp.use(apiHandler);
 const expressServer = expressApp.listen(listeningPort, listeningHostname,
   async () => {
-    const viteExpressConfig = await ViteExpress.getViteConfig();
-    const appUrl = `http://${listeningHostname}:${listeningPort}${viteExpressConfig.base}`;
-    console.log(`Serving app from root ${viteExpressConfig.root}`);
+    const viteExpressViteConfig = await ViteExpress.getViteConfig();
+    const appUrl = `http://${listeningHostname}:${listeningPort}${viteExpressViteConfig.base}`;
+    console.log(`Serving app from root ${viteExpressViteConfig.root}`);
     console.log(`App server is listening at ${appUrl}`);
   });
 ViteExpress.bind(expressApp, expressServer);
