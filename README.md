@@ -403,21 +403,19 @@ Example:
 ```js
 import express from "express";
 import ViteExpress from "vite-express";
-import { handler as apiHandler } from "./api.js";
 
-const listeningPort = 3000;
-const listeningHostname = "localhost";
+const app = express();
 
-const expressApp = express();
-expressApp.use(apiHandler);
-const expressServer = expressApp.listen(listeningPort, listeningHostname,
-  async () => {
-    const viteExpressViteConfig = await ViteExpress.getViteConfig();
-    const appUrl = `http://${listeningHostname}:${listeningPort}${viteExpressViteConfig.base}`;
-    console.log(`Serving app from root ${viteExpressViteConfig.root}`);
-    console.log(`App server is listening at ${appUrl}`);
-  });
-ViteExpress.bind(expressApp, expressServer);
+const port = 3000;
+const host = "localhost";
+
+const server = app.listen(port, host);
+
+ViteExpress.bind(app, server, async () => {
+  const { root, base } = await ViteExpress.getViteConfig();
+  console.log(`Serving app from root ${root}`);
+  console.log(`Server is listening at http://${host}:${port}${base}`);
+});
 ```
 
 ## ⚖️ License <!-- omit in toc -->
