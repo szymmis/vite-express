@@ -396,7 +396,7 @@ ViteExpress.build();
 
 ### `async getViteConfig() => Promise<ViteConfig>`
 
-Useful in case you want to write a specific `console.log` message in the listen callback, for example to construct a URL using the base too.
+Useful in case you want to know the Vite configuration parameters currently in use. For example, for writing a `console.log` message with some of that information in the listen callback.
 
 Example:
 
