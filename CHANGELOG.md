@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.0 (2024-03-23)
+
+- Export getViteConfig as a part of public API ([#124](https://github.com/szymmis/vite-express/pull/116))
+
+Contributors: [@srguiwiz](https://github.com/srguiwiz)
+
 ## 0.15.0 (2024-02-04)
 
 - Add support for express v5 ([#116](https://github.com/szymmis/vite-express/pull/116))
@@ -8,7 +14,7 @@
 
 - Fix relative imports in subpath index.html files ([#114](https://github.com/szymmis/vite-express/pull/114))
 
-Contributors: [@elturpin](https://github.com/elturpin),
+Contributors: [@elturpin](https://github.com/elturpin)
 
 ## 0.14.0 (2024-01-21)
 
