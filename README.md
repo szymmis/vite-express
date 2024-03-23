@@ -296,6 +296,7 @@ Because `ViteExpress.listen` is an async function, in most cases it doesn't matt
 | [`async bind(app, server, callback?) => Promise<void>`](#async-bindapp-server-callback--promisevoid) |
 | [`static() => RequestHandler`](#static--requesthandler)                                              |
 | [`async build() => Promise<void>`](#async-build--promisevoid)                                        |
+| [`async getViteConfig() => Promise<ViteConfig>`](#async-getviteconfig--promiseviteconfig)            |
 
 ---
 
@@ -391,6 +392,30 @@ Used when you want to build the app to production programically. It is adviced t
 
 ```js
 ViteExpress.build();
+```
+
+### `async getViteConfig() => Promise<ViteConfig>`
+
+Useful in case you want to know the Vite configuration parameters currently in use. For example, for writing a `console.log` message with some of that information in the listen callback.
+
+Example:
+
+```js
+import express from "express";
+import ViteExpress from "vite-express";
+
+const app = express();
+
+const port = 3000;
+const host = "localhost";
+
+const server = app.listen(port, host);
+
+ViteExpress.bind(app, server, async () => {
+  const { root, base } = await ViteExpress.getViteConfig();
+  console.log(`Serving app from root ${root}`);
+  console.log(`Server is listening at http://${host}:${port}${base}`);
+});
 ```
 
 ## ⚖️ License <!-- omit in toc -->

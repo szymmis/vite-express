@@ -350,4 +350,4 @@ async function build() {
   info("Build completed!");
 }
 
-export default { config, bind, listen, build, static: () => stubMiddleware };
+export default { config, bind, listen, build, static: () => stubMiddleware, getViteConfig };
