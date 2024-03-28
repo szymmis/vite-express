@@ -34,6 +34,7 @@ const Config = {
   transformer: undefined as
     | undefined
     | ((html: string, req: express.Request) => string | Promise<string>),
+  lessVerbose: undefined as boolean | undefined,
 };
 
 type ConfigurationOptions = Partial<typeof Config>;
@@ -45,6 +46,10 @@ function info(msg: string) {
       msg,
     )}`,
   );
+}
+
+function infoV(msg: string) {
+  if (!Config.lessVerbose) info(msg);
 }
 
 async function getTransformedHTML(html: string, req: express.Request) {
@@ -69,7 +74,7 @@ function getViteConfigPath() {
 
 async function resolveConfig(): Promise<ViteConfig> {
   if (Config.inlineViteConfig) {
-    info(
+    infoV(
       `${pc.yellow("Inline config")} detected, ignoring ${pc.yellow(
         "Vite config file",
       )}`,
@@ -90,7 +95,7 @@ async function resolveConfig(): Promise<ViteConfig> {
         },
         "build",
       );
-      info(
+      infoV(
         `Using ${pc.yellow("Vite")} to resolve the ${pc.yellow("config file")}`,
       );
       return config;
@@ -159,7 +164,7 @@ async function serveStatic(): Promise<RequestHandler> {
       )}`,
     );
   } else {
-    info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
+    infoV(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
   }
 
   return express.static(distPath, { index: false });
@@ -314,6 +319,7 @@ function config(config: ConfigurationOptions) {
   Config.inlineViteConfig = config.inlineViteConfig;
   Config.transformer = config.transformer;
   Config.viteConfigFile = config.viteConfigFile;
+  Config.lessVerbose = config.lessVerbose;
 }
 
 async function bind(
@@ -321,7 +327,7 @@ async function bind(
   server: http.Server | https.Server,
   callback?: () => void,
 ) {
-  info(`Running in ${pc.yellow(Config.mode)} mode`);
+  infoV(`Running in ${pc.yellow(Config.mode)} mode`);
 
   clearState();
 
@@ -345,9 +351,9 @@ function listen(app: core.Express, port: number, callback?: () => void) {
 async function build() {
   const { build } = await import("vite");
 
-  info("Build starting...");
+  infoV("Build starting...");
   await build();
-  info("Build completed!");
+  infoV("Build completed!");
 }
 
 export default { config, bind, listen, build, static: () => stubMiddleware, getViteConfig };
