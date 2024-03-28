@@ -317,6 +317,7 @@ ViteExpress.config({ /*...*/ });
 | ignorePaths      | A regex or function used to determine if matched path/request should be ignored by Vite index.html serving logic. When defined as a function, the request will be ignored when function returns true. Example of usage: Can be used to disable Vite on `/api` paths.                    | `undefined`     | `undefined` \| `RegExp` \| `(path: string, req: Request) => bool` |
 | viteConfigFile      | The path of the Vite config file. When not specified, it is assumed that the config file is in the current working directory.                    | `undefined`     | `undefined` \| `string` |
 | inlineViteConfig | When set to non-undefined value, `vite-express` will be run in [`viteless mode`](#-viteless-mode)                                                                                                                                                                                       | `undefined`     | `undefined` \| `ViteConfig`                                       |
+| lessVerbose      | When set to `true`, `vite-express` will refrain from producing `console.log` lines for normal, unexceptional startup operation.                                                                                                                                                         | `undefined`     | `undefined` \| `boolean`                                          |
 
 ```typescript
 type ViteConfig = {
