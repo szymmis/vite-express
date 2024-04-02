@@ -8,7 +8,7 @@
 [![license](https://img.shields.io/npm/l/vite-express?color=purple)](https://www.npmjs.org/package/vite-express)
 
 > If you like `vite-express` make sure to leave **a ⭐ star**!\
-> To support my work even futher you can also:\
+> You can also\
 > [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/szymmis)
 
 - [📦 Installation \& usage](#-installation--usage)
