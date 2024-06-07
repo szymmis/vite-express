@@ -13,6 +13,12 @@ type ViteConfig = {
   build: { outDir: string };
 };
 
+enum Verbosity {
+  Silent = 0,
+  ErrorsOnly = 1,
+  Normal = 2,
+}
+
 const _State = {
   viteConfig: undefined as ViteConfig | undefined,
 };
@@ -34,12 +40,14 @@ const Config = {
   transformer: undefined as
     | undefined
     | ((html: string, req: express.Request) => string | Promise<string>),
-  lessVerbose: undefined as boolean | undefined,
+  verbosity: Verbosity.Normal,
 };
 
 type ConfigurationOptions = Partial<typeof Config>;
 
-function info(msg: string) {
+function info(msg: string, minimalVerbosity = Verbosity.Normal) {
+  if (Config.verbosity < minimalVerbosity) return;
+
   const timestamp = new Date().toLocaleString("en-US").split(",")[1].trim();
   console.log(
     `${pc.dim(timestamp)} ${pc.bold(pc.cyan("[vite-express]"))} ${pc.green(
@@ -48,8 +56,8 @@ function info(msg: string) {
   );
 }
 
-function infoV(msg: string) {
-  if (!Config.lessVerbose) info(msg);
+function error(msg: string) {
+  info(pc.red(msg), Verbosity.ErrorsOnly);
 }
 
 async function getTransformedHTML(html: string, req: express.Request) {
@@ -74,7 +82,7 @@ function getViteConfigPath() {
 
 async function resolveConfig(): Promise<ViteConfig> {
   if (Config.inlineViteConfig) {
-    infoV(
+    info(
       `${pc.yellow("Inline config")} detected, ignoring ${pc.yellow(
         "Vite config file",
       )}`,
@@ -95,18 +103,16 @@ async function resolveConfig(): Promise<ViteConfig> {
         },
         "build",
       );
-      infoV(
+      info(
         `Using ${pc.yellow("Vite")} to resolve the ${pc.yellow("config file")}`,
       );
       return config;
     } catch (e) {
       console.error(e);
-      info(
-        pc.red(
-          `Unable to use ${pc.yellow("Vite")}, running in ${pc.yellow(
-            "viteless",
-          )} mode`,
-        ),
+      error(
+        `Unable to use ${pc.yellow("Vite")}, running in ${pc.yellow(
+          "viteless",
+        )} mode`,
       );
     }
   } catch (e) {
@@ -128,12 +134,10 @@ async function resolveConfig(): Promise<ViteConfig> {
       build: { outDir: outDir ?? defaultConfig.build.outDir },
     };
   } catch (e) {
-    info(
-      pc.red(
-        `Unable to locate ${pc.yellow(
-          "vite.config.*s file",
-        )}, using default options`,
-      ),
+    error(
+      `Unable to locate ${pc.yellow(
+        "vite.config.*s file",
+      )}, using default options`,
     );
 
     return getDefaultViteConfig();
@@ -157,14 +161,14 @@ async function serveStatic(): Promise<RequestHandler> {
   const distPath = await getDistPath();
 
   if (!fs.existsSync(distPath)) {
-    info(`${pc.red(`Static files at ${pc.gray(distPath)} not found!`)}`);
+    error(`${`Static files at ${pc.gray(distPath)} not found!`}`);
     info(
       `${pc.yellow(
         `Did you forget to run ${pc.bold(pc.green("vite build"))} command?`,
       )}`,
     );
   } else {
-    infoV(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
+    info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
   }
 
   return express.static(distPath, { index: false });
@@ -319,7 +323,7 @@ function config(config: ConfigurationOptions) {
   Config.inlineViteConfig = config.inlineViteConfig;
   Config.transformer = config.transformer;
   Config.viteConfigFile = config.viteConfigFile;
-  Config.lessVerbose = config.lessVerbose;
+  if (config.verbosity !== undefined) Config.verbosity = config.verbosity;
 }
 
 async function bind(
@@ -327,7 +331,7 @@ async function bind(
   server: http.Server | https.Server,
   callback?: () => void,
 ) {
-  infoV(`Running in ${pc.yellow(Config.mode)} mode`);
+  info(`Running in ${pc.yellow(Config.mode)} mode`);
 
   clearState();
 
@@ -351,9 +355,17 @@ function listen(app: core.Express, port: number, callback?: () => void) {
 async function build() {
   const { build } = await import("vite");
 
-  infoV("Build starting...");
+  info("Build starting...");
   await build();
-  infoV("Build completed!");
+  info("Build completed!");
 }
 
-export default { config, bind, listen, build, static: () => stubMiddleware, getViteConfig };
+export default {
+  config,
+  bind,
+  listen,
+  build,
+  static: () => stubMiddleware,
+  getViteConfig,
+  Verbosity,
+};
