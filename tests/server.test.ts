@@ -405,6 +405,30 @@ describe.each(["development", "production"] as const)(
         expect(response.text).toMatch(/<h1>subpath<\/h1>/);
       });
     });
+
+    describe.runIf(mode === "production")(
+      "App with custom static options",
+      async () => {
+        const app = express();
+
+        beforeAll(async () => {
+          process.chdir(path.join(__dirname, "envs/basic"));
+
+          ViteExpress.static({ maxAge: "1h" });
+
+          await new Promise<void>((done) => {
+            ViteExpress.listen(app, 0, async () => done());
+          });
+        });
+
+        test("static files have custom options", async () => {
+          const response = await request(app).get("/test.txt");
+          expect(response.headers["cache-control"]).toBe(
+            "public, max-age=3600",
+          );
+        });
+      },
+    );
   },
 );
 

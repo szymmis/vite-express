@@ -5,12 +5,14 @@ import http from "http";
 import https from "https";
 import path from "path";
 import pc from "picocolors";
-import type { ViteDevServer } from "vite";
+import { ServeStaticOptions } from "serve-static";
+import type { HmrOptions, ViteDevServer } from "vite";
 
 type ViteConfig = {
   root: string;
   base: string;
   build: { outDir: string };
+  server?: { hmr?: boolean | HmrOptions };
 };
 
 enum Verbosity {
@@ -21,6 +23,7 @@ enum Verbosity {
 
 const _State = {
   viteConfig: undefined as ViteConfig | undefined,
+  staticOptions: undefined as ServeStaticOptions | undefined,
 };
 
 function clearState() {
@@ -171,7 +174,7 @@ async function serveStatic(): Promise<RequestHandler> {
     info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
   }
 
-  return express.static(distPath, { index: false });
+  return express.static(distPath, { index: false, ..._State.staticOptions });
 }
 
 const stubMiddleware: RequestHandler = (req, res, next) => next();
@@ -304,7 +307,7 @@ async function startServer(server: http.Server | https.Server) {
       appType: "custom",
       server: {
         middlewareMode: true,
-        hmr: { server },
+        hmr: config.server?.hmr ?? { server },
       },
     }),
   );
@@ -365,7 +368,10 @@ export default {
   bind,
   listen,
   build,
-  static: () => stubMiddleware,
+  static: (options?: ServeStaticOptions) => {
+    _State.staticOptions = options;
+    return stubMiddleware;
+  },
   getViteConfig,
   Verbosity,
 };
