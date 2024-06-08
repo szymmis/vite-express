@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.17.0 (2024-06-08)
+
+- Allow specyfing `vite-express` verbosity level ([#128](https://github.com/szymmis/vite-express/pull/128))
+- Add possibility to override default `express.static()` options ([#134](https://github.com/szymmis/vite-express/pull/134))
+- Respect HMR options from Vite config ([#135](https://github.com/szymmis/vite-express/pull/135))
+
+Contributors: [@srguiwiz](https://github.com/srguiwiz), [@lucasavila00](https://github.com/lucasavila00)
+
 ## 0.16.0 (2024-03-23)
 
 - Export getViteConfig as a part of public API ([#124](https://github.com/szymmis/vite-express/pull/116))
