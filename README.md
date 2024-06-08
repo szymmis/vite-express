@@ -293,14 +293,14 @@ Because `ViteExpress.listen` is an async function, in most cases it doesn't matt
 
 ## 📝 Documentation
 
-| `⚡ vite-express` functions                                                                           |
-| ---------------------------------------------------------------------------------------------------- |
-| [`config(options) => void`](#configoptions--void)                                                    |
-| [`listen(app, port, callback?) => http.Server`](#listenapp-port-callback--httpserver)                |
-| [`async bind(app, server, callback?) => Promise<void>`](#async-bindapp-server-callback--promisevoid) |
-| [`static() => RequestHandler`](#static--requesthandler)                                              |
-| [`async build() => Promise<void>`](#async-build--promisevoid)                                        |
-| [`async getViteConfig() => Promise<ViteConfig>`](#async-getviteconfig--promiseviteconfig)            |
+| `⚡ vite-express` functions                                                                                    |
+| ------------------------------------------------------------------------------------------------------------- |
+| [`config(options) => void`](#configoptions--void)                                                             |
+| [`listen(app, port, callback?) => http.Server`](#listenapp-port-callback--httpserver)                         |
+| [`async bind(app, server, callback?) => Promise<void>`](#async-bindapp-server-callback--promisevoid)          |
+| [`static(options?: ServeStaticOptions) => RequestHandler`](#staticoptions-servestaticoptions--requesthandler) |
+| [`async build() => Promise<void>`](#async-build--promisevoid)                                                 |
+| [`async getViteConfig() => Promise<ViteConfig>`](#async-getviteconfig--promiseviteconfig)                     |
 
 ---
 
@@ -373,8 +373,9 @@ ViteExpress.bind(app, server);
 
 ### `static(options?: ServeStaticOptions) => RequestHandler`
 
-Used as a typical express middleware to indicate to `vite-express` the exact moment when you want to register static serving logic. You can use this method to prevent some of your request blocking middleware, such as authentication/authorization, from blocking files coming from your server, which would make displaying for example login page impossible because of blocked html, styles and scripts files. Another use-case is when you want to override [options][serve-static-options] that `vite-express` passes to [`express.static`](https://expressjs.com/en/starter/static-files.html) middleware in production mode. In development mode it doesn't have any effect.
+Used as a typical express middleware to indicate to `vite-express` the exact moment when you want to register static serving logic. You can use this method to prevent some of your request blocking middleware, such as authentication/authorization, from blocking files coming from your server, which would make displaying for example login page impossible because of blocked html, styles and scripts files.
 
+Another use-case is when you want to override [options][serve-static-options] that `vite-express` passes to [`express.static`](https://expressjs.com/en/starter/static-files.html) middleware in production mode. In development mode it doesn't have any effect.
 
 Example:
 
