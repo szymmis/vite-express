@@ -208,7 +208,7 @@ describe.each(TEMPLATES)(`Template $name`, (template) => {
           replaceStringInFile(
             path.join(tmpdir, "test", "custom.config.js"),
             "plugins:",
-            "base: '/test', plugins:",
+            "server: { hmr: { port: 3001 } }, base: '/test', plugins:",
           );
         } else {
           fs.writeFileSync(
@@ -218,6 +218,7 @@ describe.each(TEMPLATES)(`Template $name`, (template) => {
 
             export default defineConfig({
               base: '/test',
+              server: { hmr: { port: 3001 } }
             });
 
             `,
