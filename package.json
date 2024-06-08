@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "concurrently -i -P \"sh scripts/dev.sh {1}\" \"yarn build --watch\" --",
     "build": "rollup --config rollup.config.js --bundleConfigAsCjs",
-    "postbuild": "sed -i \"s/export default _default/export = _default/\" dist/main.d.ts",
+    "postbuild": "node -e 'const fs = require(\"fs\"); fs.writeFileSync(\"dist/main.d.ts\", fs.readFileSync(\"dist/main.d.ts\", \"utf8\").replace(/export default _default/, \"export = _default\"));'",
     "pretest": "yarn build",
     "test": "vitest --pool=forks",
     "format": "prettier --write --loglevel silent",
