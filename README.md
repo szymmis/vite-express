@@ -327,8 +327,11 @@ type ViteConfig = {
    root?: string;
    base?: string;
    build?: { outDir: string };
+   server?: { hmr?: boolean | HmrOptions };
 }
 ```
+
+You can read more about `HmrOptions` in Vite [docs](https://vitejs.dev/config/server-options.html#server-hmr).
 
 ### `listen(app, port, callback?) => http.Server`
 
