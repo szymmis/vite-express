@@ -15,6 +15,12 @@ type ViteConfig = {
   server?: { hmr?: boolean | HmrOptions };
 };
 
+enum Verbosity {
+  Silent = 0,
+  ErrorsOnly = 1,
+  Normal = 2,
+}
+
 const _State = {
   viteConfig: undefined as ViteConfig | undefined,
   staticOptions: undefined as ServeStaticOptions | undefined,
@@ -37,17 +43,24 @@ const Config = {
   transformer: undefined as
     | undefined
     | ((html: string, req: express.Request) => string | Promise<string>),
+  verbosity: Verbosity.Normal,
 };
 
 type ConfigurationOptions = Partial<typeof Config>;
 
-function info(msg: string) {
+function info(msg: string, minimalVerbosity = Verbosity.Normal) {
+  if (Config.verbosity < minimalVerbosity) return;
+
   const timestamp = new Date().toLocaleString("en-US").split(",")[1].trim();
   console.log(
     `${pc.dim(timestamp)} ${pc.bold(pc.cyan("[vite-express]"))} ${pc.green(
       msg,
     )}`,
   );
+}
+
+function error(msg: string) {
+  info(pc.red(msg), Verbosity.ErrorsOnly);
 }
 
 async function getTransformedHTML(html: string, req: express.Request) {
@@ -99,12 +112,10 @@ async function resolveConfig(): Promise<ViteConfig> {
       return config;
     } catch (e) {
       console.error(e);
-      info(
-        pc.red(
-          `Unable to use ${pc.yellow("Vite")}, running in ${pc.yellow(
-            "viteless",
-          )} mode`,
-        ),
+      error(
+        `Unable to use ${pc.yellow("Vite")}, running in ${pc.yellow(
+          "viteless",
+        )} mode`,
       );
     }
   } catch (e) {
@@ -126,12 +137,10 @@ async function resolveConfig(): Promise<ViteConfig> {
       build: { outDir: outDir ?? defaultConfig.build.outDir },
     };
   } catch (e) {
-    info(
-      pc.red(
-        `Unable to locate ${pc.yellow(
-          "vite.config.*s file",
-        )}, using default options`,
-      ),
+    error(
+      `Unable to locate ${pc.yellow(
+        "vite.config.*s file",
+      )}, using default options`,
     );
 
     return getDefaultViteConfig();
@@ -155,7 +164,7 @@ async function serveStatic(): Promise<RequestHandler> {
   const distPath = await getDistPath();
 
   if (!fs.existsSync(distPath)) {
-    info(`${pc.red(`Static files at ${pc.gray(distPath)} not found!`)}`);
+    error(`${`Static files at ${pc.gray(distPath)} not found!`}`);
     info(
       `${pc.yellow(
         `Did you forget to run ${pc.bold(pc.green("vite build"))} command?`,
@@ -317,6 +326,7 @@ function config(config: ConfigurationOptions) {
   Config.inlineViteConfig = config.inlineViteConfig;
   Config.transformer = config.transformer;
   Config.viteConfigFile = config.viteConfigFile;
+  if (config.verbosity !== undefined) Config.verbosity = config.verbosity;
 }
 
 async function bind(
@@ -363,4 +373,5 @@ export default {
     return stubMiddleware;
   },
   getViteConfig,
+  Verbosity,
 };

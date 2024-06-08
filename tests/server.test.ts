@@ -1,6 +1,8 @@
 import express from "express";
+import fs from "fs";
 import http from "http";
 import { AddressInfo } from "net";
+import os from "os";
 import path from "path";
 import * as SocketIO from "socket.io";
 import { io as SocketIOClient } from "socket.io-client";
@@ -429,3 +431,46 @@ describe.each(["development", "production"] as const)(
     );
   },
 );
+
+describe("Custom tests", () => {
+  describe("App with custom verbosity settings", async () => {
+    const app = express();
+    const Verbosity = ViteExpress.Verbosity;
+
+    describe.each([
+      {
+        verbosity: Verbosity.Silent,
+        name: "Silent",
+        expectedLogsCount: 0,
+      },
+      {
+        verbosity: Verbosity.ErrorsOnly,
+        name: "ErrorsOnly",
+        expectedLogsCount: 1,
+      },
+      {
+        verbosity: Verbosity.Normal,
+        name: "Normal",
+        expectedLogsCount: 4,
+      },
+    ] as const)("Verbosity $name", ({ verbosity, expectedLogsCount }) => {
+      beforeAll(() => {
+        const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), "/"));
+        process.chdir(tmpdir);
+        ViteExpress.config({ verbosity, mode: "production" });
+      });
+
+      test(`console.log called ${expectedLogsCount} times`, async () => {
+        const spyConsoleLog = vi.spyOn(console, "log");
+
+        await new Promise<void>((done) => {
+          ViteExpress.listen(app, 0, async () => done());
+        });
+
+        expect(spyConsoleLog).toHaveBeenCalledTimes(expectedLogsCount);
+
+        vi.restoreAllMocks();
+      });
+    });
+  });
+});
