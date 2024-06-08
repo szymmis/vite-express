@@ -821,7 +821,7 @@
   resolved "https://registry.yarnpkg.com/@types/methods/-/methods-1.1.4.tgz#d3b7ac30ac47c91054ea951ce9eed07b1051e547"
   integrity sha512-ymXWVrDiCxTBE3+RIrrP533E70eA+9qu7zdWoHuOmGujkYtzf4HQF96b8nwHLqhuf4ykX61IGRIB38CC6/sImQ==
 
-"@types/mime@*":
+"@types/mime@*", "@types/mime@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-4.0.0.tgz#b5f8a75697ac775ecf1daaea9bfb91cde065b397"
   integrity sha512-5eEkJZ/BLvTE3vXGKkWlyTSUVZuzj23Wj8PoyOq2lt5I3CYbiLBOPb3XmCW6QcuOibIUE6emHXHt9E/F/rCa6w==
