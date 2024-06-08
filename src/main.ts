@@ -5,12 +5,13 @@ import http from "http";
 import https from "https";
 import path from "path";
 import pc from "picocolors";
-import type { ViteDevServer } from "vite";
+import type { HmrOptions, ViteDevServer } from "vite";
 
 type ViteConfig = {
   root: string;
   base: string;
   build: { outDir: string };
+  server?: { hmr?: boolean | HmrOptions };
 };
 
 const _State = {
@@ -295,7 +296,7 @@ async function startServer(server: http.Server | https.Server) {
       appType: "custom",
       server: {
         middlewareMode: true,
-        hmr: { server },
+        hmr: config.server?.hmr ?? { server },
       },
     }),
   );
@@ -350,4 +351,11 @@ async function build() {
   info("Build completed!");
 }
 
-export default { config, bind, listen, build, static: () => stubMiddleware, getViteConfig };
+export default {
+  config,
+  bind,
+  listen,
+  build,
+  static: () => stubMiddleware,
+  getViteConfig,
+};
