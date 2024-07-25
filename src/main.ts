@@ -298,10 +298,9 @@ async function startServer(server: http.Server | https.Server) {
   const { createServer, mergeConfig } = await import("vite");
 
   const config = await getViteConfig();
-  const isUsingViteResolvedConfig = Object.entries(config).length > 3;
 
   const vite = await createServer(
-    mergeConfig(isUsingViteResolvedConfig ? {} : config, {
+    mergeConfig(config, {
       configFile: Config.viteConfigFile,
       clearScreen: false,
       appType: "custom",
