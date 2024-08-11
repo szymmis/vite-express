@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.18.0 (2024-08-11)
+
+- Fix issue where passing the server config disables inline config ([#140](https://github.com/szymmis/vite-express/pull/140))
+- Bump dependencies
+
+Contributors: [@Vija02](https://github.com/Vija02)
+
 ## 0.17.0 (2024-06-08)
 
 - Allow specyfing `vite-express` verbosity level ([#128](https://github.com/szymmis/vite-express/pull/128))
