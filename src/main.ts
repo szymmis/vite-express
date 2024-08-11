@@ -298,7 +298,7 @@ async function startServer(server: http.Server | https.Server) {
   const { createServer, mergeConfig } = await import("vite");
 
   const config = await getViteConfig();
-  const isUsingViteResolvedConfig = Object.entries(config).length > 3;
+  const isUsingViteResolvedConfig = "assetsInclude" in config;
 
   const vite = await createServer(
     mergeConfig(isUsingViteResolvedConfig ? {} : config, {
