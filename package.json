@@ -21,6 +21,7 @@
     "publish:cli": "bash scripts/publish-cli.sh"
   },
   "dependencies": {
+    "express-static-gzip": "^2.1.7",
     "picocolors": "^1.0.0"
   },
   "devDependencies": {
