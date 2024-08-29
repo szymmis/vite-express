@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.19.0 (2024-08-29)
+
+- Use express-static-gzip for improved static file serving ([#144](https://github.com/szymmis/vite-express/pull/144))
+- Bump dependencies
+
+Contributors: [@je4ngomes](https://github.com/je4ngomes)
+
 ## 0.18.0 (2024-08-11)
 
 - Fix issue where passing the server config disables inline config ([#140](https://github.com/szymmis/vite-express/pull/140))
