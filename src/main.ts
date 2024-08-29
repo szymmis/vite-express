@@ -5,7 +5,10 @@ import http from "http";
 import https from "https";
 import path from "path";
 import pc from "picocolors";
-import { ServeStaticOptions } from "serve-static";
+import expressStaticGzip, {
+  ExpressStaticGzipOptions,
+} from "express-static-gzip";
+
 import type { HmrOptions, ViteDevServer } from "vite";
 
 type ViteConfig = {
@@ -23,7 +26,7 @@ enum Verbosity {
 
 const _State = {
   viteConfig: undefined as ViteConfig | undefined,
-  staticOptions: undefined as ServeStaticOptions | undefined,
+  staticOptions: undefined as ExpressStaticGzipOptions | undefined,
 };
 
 function clearState() {
@@ -174,7 +177,7 @@ async function serveStatic(): Promise<RequestHandler> {
     info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
   }
 
-  return express.static(distPath, { index: false, ..._State.staticOptions });
+  return expressStaticGzip(distPath, { index: false, ..._State.staticOptions });
 }
 
 const stubMiddleware: RequestHandler = (req, res, next) => next();
@@ -368,7 +371,7 @@ export default {
   bind,
   listen,
   build,
-  static: (options?: ServeStaticOptions) => {
+  static: (options?: ExpressStaticGzipOptions) => {
     _State.staticOptions = options;
     return stubMiddleware;
   },
