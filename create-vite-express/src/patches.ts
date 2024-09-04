@@ -1,8 +1,12 @@
-export const PATCHES: Record<string, (content: string, variables: Array<String>) => string> = {
-  "package.json": (content: string, variables: Array<String>) => {
+type Variables = {
+  projectName?: string
+}
+
+export const PATCHES: Record<string, (content: string, variables: Variables) => string> = {
+  "package.json": (content: string, variables: Variables) => {
     const json = JSON.parse(content);
 
-    json["name"] = variables[0]
+    json["name"] = variables.projectName
 
     if (process.platform === "win32") {
       json.scripts["start"] = json.scripts["start"].replace(
