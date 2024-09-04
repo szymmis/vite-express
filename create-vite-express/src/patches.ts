@@ -1,6 +1,5 @@
 export const PATCHES: Record<string, (content: string) => string> = {
   "package.json": (content: string) => {
-    console.log(process.platform);
     if (process.platform === "win32") {
       const json = JSON.parse(content);
       json.scripts["start"] = json.scripts["start"].replace(
