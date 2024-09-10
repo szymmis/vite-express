@@ -37,7 +37,7 @@ export async function main({
     const filePath = path.join(projectPath, patch);
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, "utf-8");
-      fs.writeFileSync(filePath, PATCHES[patch](content));
+      fs.writeFileSync(filePath, PATCHES[patch](content, { projectName }));
     }
   }
 
