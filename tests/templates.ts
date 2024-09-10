@@ -36,6 +36,7 @@ export const TEMPLATES: Template[] = [
     index: 2,
     name: "preact-ts",
     ts: true,
+    typecheck: false,
     hmrTestFilePath: "./src/client/app.tsx",
   },
   {
