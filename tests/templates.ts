@@ -29,11 +29,23 @@ export const TEMPLATES: Template[] = [
   },
   {
     index: 2,
+    name: "preact",
+    hmrTestFilePath: "./src/client/app.jsx",
+  },
+  {
+    index: 2,
+    name: "preact-ts",
+    ts: true,
+    typecheck: false,
+    hmrTestFilePath: "./src/client/app.tsx",
+  },
+  {
+    index: 3,
     name: "vue",
     hmrTestFilePath: "./src/client/components/HelloWorld.vue",
   },
   {
-    index: 2,
+    index: 3,
     name: "vue-ts",
     ts: true,
     typecheck: false,
