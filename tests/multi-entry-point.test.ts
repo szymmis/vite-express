@@ -9,8 +9,7 @@ import { cmd } from "./libs/utils";
 
 describe.each([{ name: "production" }, { name: "development" }])(
   "$name multiple entry points",
-  (args) => {
-    const PORT = args.name === "production" ? 3010 : 3011;
+  () => {
     const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), "/"));
     let server: {
       process: ChildProcessWithoutNullStreams;
@@ -63,22 +62,22 @@ describe.each([{ name: "production" }, { name: "development" }])(
           import ViteExpress from "vite-express";
           
           const app = express();
-          ViteExpress.listen(app, ${PORT}, () =>
-            console.log("Server is listening on port ${PORT}..."),
+          ViteExpress.listen(app, 3000, () =>
+            console.log("Server is listening on port 3000..."),
           );
       `;
       fs.writeFileSync(tmpdir + "/index.js", indexJs);
       server = await cmd("node index.js")
         .cwd(tmpdir)
         .awaitOutput(["Running in", "development"])
-        .awaitOutput(`Server is listening on port ${PORT}...`)
+        .awaitOutput(`Server is listening on port 3000...`)
         .run();
 
       const output = await puppeteer
         .launch({ headless: true })
         .then(async (browser) => {
           const page = await browser.newPage();
-          await page.goto(`http://localhost:${PORT}`);
+          await page.goto(`http://localhost:3000`);
           return { browser, page };
         });
 
@@ -89,7 +88,7 @@ describe.each([{ name: "production" }, { name: "development" }])(
     });
 
     async function getRouteContent(path: string) {
-      await page.goto(`http://localhost:${PORT}${path}`);
+      await page.goto(`http://localhost:3000${path}`);
       return await page.$eval("body", (el) => el.textContent);
     }
 
