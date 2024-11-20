@@ -176,7 +176,11 @@ async function serveStatic(): Promise<RequestHandler> {
     info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
   }
 
-  return expressStaticGzip(distPath, { index: false, ..._State.staticOptions });
+  return expressStaticGzip(distPath, {
+    index: false,
+    serveStatic: { redirect: false },
+    ..._State.staticOptions,
+  });
 }
 
 const stubMiddleware: RequestHandler = (req, res, next) => next();
@@ -230,6 +234,12 @@ function findTemplateFilePath(
 
   // find closest index.html to provided path
   const basePath = reqPath.slice(0, reqPath.lastIndexOf("/"));
+  // if the path doesn't end with a /, look for root/req/path.html
+  if (!reqPath.endsWith("/")) {
+    const pathToTest = path.join(root, reqPath + ".html");
+    if (fs.existsSync(pathToTest)) return pathToTest;
+  }
+
   const dirs = basePath.split("/");
 
   while (dirs.length > 0) {
