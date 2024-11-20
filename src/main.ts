@@ -1,14 +1,13 @@
 import express, { RequestHandler } from "express";
 import core from "express-serve-static-core";
+import expressStaticGzip, {
+  ExpressStaticGzipOptions,
+} from "express-static-gzip";
 import fs from "fs";
 import http from "http";
 import https from "https";
 import path from "path";
 import pc from "picocolors";
-import expressStaticGzip, {
-  ExpressStaticGzipOptions,
-} from "express-static-gzip";
-
 import type { HmrOptions, ViteDevServer } from "vite";
 
 type ViteConfig = {
@@ -121,7 +120,7 @@ async function resolveConfig(): Promise<ViteConfig> {
         )} mode`,
       );
     }
-  } catch (e) {
+  } catch {
     /* empty */
   }
 
@@ -139,7 +138,7 @@ async function resolveConfig(): Promise<ViteConfig> {
       base: base ?? defaultConfig.base,
       build: { outDir: outDir ?? defaultConfig.build.outDir },
     };
-  } catch (e) {
+  } catch {
     error(
       `Unable to locate ${pc.yellow(
         "vite.config.*s file",
@@ -195,7 +194,7 @@ async function injectStaticMiddleware(
   const router = (() => {
     try {
       return app.router;
-    } catch (e) {
+    } catch {
       return app._router;
     }
   })();
