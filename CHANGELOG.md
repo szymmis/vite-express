@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.20.0 (2024-11-27)
+
+- Bring routing behaviour in line with vite dev and vite preview ([#153](https://github.com/szymmis/vite-express/pull/153))
+
+Contributors: [@jameslounds](https://github.com/jameslounds)
+
 ## 0.19.0 (2024-08-29)
 
 - Use express-static-gzip for improved static file serving ([#144](https://github.com/szymmis/vite-express/pull/144))
