@@ -1,14 +1,13 @@
 import express, { RequestHandler } from "express";
 import core from "express-serve-static-core";
+import expressStaticGzip, {
+  ExpressStaticGzipOptions,
+} from "express-static-gzip";
 import fs from "fs";
 import http from "http";
 import https from "https";
 import path from "path";
 import pc from "picocolors";
-import expressStaticGzip, {
-  ExpressStaticGzipOptions,
-} from "express-static-gzip";
-
 import type { HmrOptions, ViteDevServer } from "vite";
 
 type ViteConfig = {
@@ -121,7 +120,7 @@ async function resolveConfig(): Promise<ViteConfig> {
         )} mode`,
       );
     }
-  } catch (e) {
+  } catch {
     /* empty */
   }
 
@@ -139,7 +138,7 @@ async function resolveConfig(): Promise<ViteConfig> {
       base: base ?? defaultConfig.base,
       build: { outDir: outDir ?? defaultConfig.build.outDir },
     };
-  } catch (e) {
+  } catch {
     error(
       `Unable to locate ${pc.yellow(
         "vite.config.*s file",
@@ -177,7 +176,11 @@ async function serveStatic(): Promise<RequestHandler> {
     info(`${pc.green(`Serving static files from ${pc.gray(distPath)}`)}`);
   }
 
-  return expressStaticGzip(distPath, { index: false, ..._State.staticOptions });
+  return expressStaticGzip(distPath, {
+    index: false,
+    serveStatic: { redirect: false },
+    ..._State.staticOptions,
+  });
 }
 
 const stubMiddleware: RequestHandler = (req, res, next) => next();
@@ -195,7 +198,7 @@ async function injectStaticMiddleware(
   const router = (() => {
     try {
       return app.router;
-    } catch (e) {
+    } catch {
       return app._router;
     }
   })();
@@ -231,6 +234,12 @@ function findTemplateFilePath(
 
   // find closest index.html to provided path
   const basePath = reqPath.slice(0, reqPath.lastIndexOf("/"));
+  // if the path doesn't end with a /, look for root/req/path.html
+  if (!reqPath.endsWith("/")) {
+    const pathToTest = path.join(root, reqPath + ".html");
+    if (fs.existsSync(pathToTest)) return pathToTest;
+  }
+
   const dirs = basePath.split("/");
 
   while (dirs.length > 0) {
