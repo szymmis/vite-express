@@ -33,16 +33,9 @@ describe.each(TEMPLATES)(`Template $name`, (template) => {
       .assert();
   });
 
-  test(
-    "install dependencies",
-    async () => {
-      return cmd("npm install")
-        .cwd(path.join(tmpdir, "test"))
-        .success()
-        .assert();
-    },
-    { timeout: 60000 },
-  );
+  test("install dependencies", async () => {
+    return cmd("npm install").cwd(path.join(tmpdir, "test")).success().assert();
+  });
 
   test.runIf(template.ts && template.typecheck !== false)(
     "check client types",
