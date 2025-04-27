@@ -71,7 +71,7 @@ describe.each(TEMPLATES)(`Template $name`, (template) => {
           .run();
 
         const output = await puppeteer
-          .launch({ headless: "new" })
+          .launch({ headless: "shell" })
           .then(async (browser) => {
             const page = await browser.newPage();
             await page.goto(`http://localhost:3000`);
@@ -155,7 +155,7 @@ describe.each(TEMPLATES)(`Template $name`, (template) => {
           .run();
 
         const output = await puppeteer
-          .launch({ headless: "new" })
+          .launch({ headless: "shell" })
           .then(async (browser) => {
             const page = await browser.newPage();
             await page.goto(`http://localhost:3000`);
@@ -257,7 +257,7 @@ describe.each(TEMPLATES)(`Template $name`, (template) => {
           .run();
 
         const output = await puppeteer
-          .launch({ headless: "new" })
+          .launch({ headless: "shell" })
           .then(async (browser) => {
             const page = await browser.newPage();
             await page.goto(`http://localhost:3000`);
@@ -351,7 +351,7 @@ describe.each(TEMPLATES)(`Template $name`, (template) => {
           .run();
 
         const output = await puppeteer
-          .launch({ headless: "new" })
+          .launch({ headless: "shell" })
           .then(async (browser) => {
             const page = await browser.newPage();
             await page.goto(`http://localhost:3000`);

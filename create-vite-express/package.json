@@ -9,21 +9,21 @@
     "build": "rollup -c --bundleConfigAsCjs"
   },
   "dependencies": {
-    "fs-extra": "^11.2.0",
+    "fs-extra": "^11.3.0",
     "kolorist": "^1.8.0",
     "prompts": "^2.4.2"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.1.6",
+    "@rollup/plugin-typescript": "^12.1.2",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.2.0",
+    "@types/node": "^22.15.2",
     "@types/prompts": "^2.4.9",
-    "nodemon": "^3.1.4",
-    "rollup": "^4.20.0",
+    "nodemon": "^3.1.10",
+    "rollup": "^4.40.0",
     "rollup-plugin-add-shebang": "^0.3.1",
-    "tslib": "^2.6.3",
-    "typescript": "^5.5.4"
+    "tslib": "^2.8.1",
+    "typescript": "^5.8.3"
   },
   "bin": "bin/cli.js",
   "files": [

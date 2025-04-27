@@ -9,11 +9,11 @@
     "build": "vite build"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
-    "vite": "^5.0.2"
+    "nodemon": "^3.1.10",
+    "vite": "^6.3.3"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "express": "^5.1.0",
     "vite-express": "*"
   }
 }
