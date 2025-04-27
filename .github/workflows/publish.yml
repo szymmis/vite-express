@@ -6,12 +6,12 @@ on:
 jobs:
   test:
     name: Run tests on local build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: yarn install
       - run: yarn test
   publish:
@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           registry-url: "https://registry.npmjs.org"
-          node-version: 20
+          node-version: 22
       - run: yarn install
       - run: yarn build
       - run: npm publish

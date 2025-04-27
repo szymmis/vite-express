@@ -3,11 +3,11 @@ on: pull_request
 jobs:
   test-local:
     name: Run tests on local build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: yarn install
       - run: yarn test
