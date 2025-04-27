@@ -192,7 +192,9 @@ async function injectStaticMiddleware(
   const config = await getViteConfig();
 
   app.use(config.base, (req, res, next) =>
-    req.path.endsWith(".html") ? next() : middleware(req, res, next),
+    req.path.endsWith(".html") && !req.originalUrl.includes("?html-proxy")
+      ? next()
+      : middleware(req, res, next),
   );
 
   const router = (() => {

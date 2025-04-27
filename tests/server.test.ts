@@ -72,6 +72,22 @@ describe.each(["development", "production"] as const)(
         const response = await request(app).get("/test.txt");
         expect(response.text).toBe("Hello from test.txt");
       });
+
+      test.runIf(mode === "development")(
+        "inline scripts in development are served correctly",
+        async () => {
+          let response = await request(app).get("/").expect(200);
+          const inlineScriptSrc = response.text
+            .split("\n")
+            .filter((line) => line.includes('script type="module"'))
+            .map((line) => line.trim().match(/src=["']([^"']+)["']/)?.[1])
+            .find((src) => src?.includes("?html-proxy"));
+          expect(inlineScriptSrc).toBeDefined();
+
+          response = await request(app).get(inlineScriptSrc!);
+          expect(response.text).toContain("let test = true;");
+        },
+      );
     });
 
     describe("Basic app with explicit static middleware", () => {
@@ -136,6 +152,22 @@ describe.each(["development", "production"] as const)(
         expect(response.headers.before).toBe("1");
         expect(response.headers.after).toBe(undefined);
       });
+
+      test.runIf(mode === "development")(
+        "inline scripts in development are served correctly",
+        async () => {
+          let response = await request(app).get("/").expect(200);
+          const inlineScriptSrc = response.text
+            .split("\n")
+            .filter((line) => line.includes('script type="module"'))
+            .map((line) => line.trim().match(/src=["']([^"']+)["']/)?.[1])
+            .find((src) => src?.includes("?html-proxy"));
+          expect(inlineScriptSrc).toBeDefined();
+
+          response = await request(app).get(inlineScriptSrc!);
+          expect(response.text).toContain("let test = true;");
+        },
+      );
     });
 
     describe("App with custom http server", () => {
@@ -184,6 +216,22 @@ describe.each(["development", "production"] as const)(
         const response = await request(app).get("/test.txt");
         expect(response.text).toBe("Hello from test.txt");
       });
+
+      test.runIf(mode === "development")(
+        "inline scripts in development are served correctly",
+        async () => {
+          let response = await request(app).get("/").expect(200);
+          const inlineScriptSrc = response.text
+            .split("\n")
+            .filter((line) => line.includes('script type="module"'))
+            .map((line) => line.trim().match(/src=["']([^"']+)["']/)?.[1])
+            .find((src) => src?.includes("?html-proxy"));
+          expect(inlineScriptSrc).toBeDefined();
+
+          response = await request(app).get(inlineScriptSrc!);
+          expect(response.text).toContain("let test = true;");
+        },
+      );
     });
 
     describe("App with socket.io", () => {
@@ -269,6 +317,22 @@ describe.each(["development", "production"] as const)(
         const response = await request(app).get("/test.txt");
         expect(response.text).toBe("Hello from test.txt");
       });
+
+      test.runIf(mode === "development")(
+        "inline scripts in development are served correctly",
+        async () => {
+          let response = await request(app).get("/").expect(200);
+          const inlineScriptSrc = response.text
+            .split("\n")
+            .filter((line) => line.includes('script type="module"'))
+            .map((line) => line.trim().match(/src=["']([^"']+)["']/)?.[1])
+            .find((src) => src?.includes("?html-proxy"));
+          expect(inlineScriptSrc).toBeDefined();
+
+          response = await request(app).get(inlineScriptSrc!);
+          expect(response.text).toContain("let test = true;");
+        },
+      );
     });
 
     describe("App with async transformer function", () => {
@@ -322,6 +386,22 @@ describe.each(["development", "production"] as const)(
         const response = await request(app).get("/test.txt");
         expect(response.text).toBe("Hello from test.txt");
       });
+
+      test.runIf(mode === "development")(
+        "inline scripts in development are served correctly",
+        async () => {
+          let response = await request(app).get("/").expect(200);
+          const inlineScriptSrc = response.text
+            .split("\n")
+            .filter((line) => line.includes('script type="module"'))
+            .map((line) => line.trim().match(/src=["']([^"']+)["']/)?.[1])
+            .find((src) => src?.includes("?html-proxy"));
+          expect(inlineScriptSrc).toBeDefined();
+
+          response = await request(app).get(inlineScriptSrc!);
+          expect(response.text).toContain("let test = true;");
+        },
+      );
     });
 
     describe("App with ignored paths", async () => {
@@ -378,6 +458,22 @@ describe.each(["development", "production"] as const)(
         const response = await request(app).get("/test.txt");
         expect(response.text).toBe("Hello from test.txt");
       });
+
+      test.runIf(mode === "development")(
+        "inline scripts in development are served correctly",
+        async () => {
+          let response = await request(app).get("/").expect(200);
+          const inlineScriptSrc = response.text
+            .split("\n")
+            .filter((line) => line.includes('script type="module"'))
+            .map((line) => line.trim().match(/src=["']([^"']+)["']/)?.[1])
+            .find((src) => src?.includes("?html-proxy"));
+          expect(inlineScriptSrc).toBeDefined();
+
+          response = await request(app).get(inlineScriptSrc!);
+          expect(response.text).toContain("let test = true;");
+        },
+      );
     });
 
     describe("App with no index at root", async () => {
@@ -414,7 +510,7 @@ describe.each(["development", "production"] as const)(
         beforeAll(async () => {
           process.chdir(path.join(__dirname, "envs/basic"));
 
-          ViteExpress.static({ maxAge: "1h" });
+          ViteExpress.static({ serveStatic: { maxAge: "2137s" } });
 
           await new Promise<void>((done) => {
             ViteExpress.listen(app, 0, async () => done());
@@ -424,9 +520,25 @@ describe.each(["development", "production"] as const)(
         test("static files have custom options", async () => {
           const response = await request(app).get("/test.txt");
           expect(response.headers["cache-control"]).toBe(
-            "public, max-age=3600",
+            "public, max-age=2137",
           );
         });
+
+        test.runIf(mode === "development")(
+          "inline scripts in development are served correctly",
+          async () => {
+            let response = await request(app).get("/").expect(200);
+            const inlineScriptSrc = response.text
+              .split("\n")
+              .filter((line) => line.includes('script type="module"'))
+              .map((line) => line.trim().match(/src=["']([^"']+)["']/)?.[1])
+              .find((src) => src?.includes("?html-proxy"));
+            expect(inlineScriptSrc).toBeDefined();
+
+            response = await request(app).get(inlineScriptSrc!);
+            expect(response.text).toContain("let test = true;");
+          },
+        );
       },
     );
   },
