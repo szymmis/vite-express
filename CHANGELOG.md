@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.21.0 (2025-04-27)
+
+- Bump Vite to v6, express to v5 and other dependencies to their newest versions
+
 ## 0.20.0 (2024-11-27)
 
 - Bring routing behaviour in line with vite dev and vite preview ([#153](https://github.com/szymmis/vite-express/pull/153))
