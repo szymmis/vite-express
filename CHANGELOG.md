@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.21.1 (2025-04-27)
+
+- Fix serving inline scripts in development mode ([#161](https://github.com/szymmis/vite-express/pull/161))
+
 ## 0.21.0 (2025-04-27)
 
 - Bump Vite to v6, express to v5 and other dependencies to their newest versions
