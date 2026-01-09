@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.22.0 (2026-01-09)
+
+- Bump dependencies ([#164](https://github.com/szymmis/vite-express/pull/164))
+
 ## 0.21.1 (2025-04-27)
 
 - Fix serving inline scripts in development mode ([#161](https://github.com/szymmis/vite-express/pull/161))
