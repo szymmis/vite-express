@@ -1,3 +1,8 @@
+if [ -z "$1" ]; then
+  echo "Must specify version: [patch|minor|major]"
+  exit 1
+fi
+
 if [ "$(echo $(git diff HEAD --stat))" != '' ]; then
   echo -e "\u001b[31mGit working directory is not clean!"
   exit 1
