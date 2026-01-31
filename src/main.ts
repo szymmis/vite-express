@@ -1,5 +1,4 @@
 import express, { RequestHandler } from "express";
-import core from "express-serve-static-core";
 import expressStaticGzip, {
   ExpressStaticGzipOptions,
 } from "express-static-gzip";
@@ -9,6 +8,8 @@ import https from "https";
 import path from "path";
 import pc from "picocolors";
 import type { HmrOptions, ViteDevServer } from "vite";
+
+type ExpressApp = ReturnType<typeof express>;
 
 type ViteConfig = {
   root: string;
@@ -186,7 +187,7 @@ async function serveStatic(): Promise<RequestHandler> {
 const stubMiddleware: RequestHandler = (req, res, next) => next();
 
 async function injectStaticMiddleware(
-  app: core.Express,
+  app: ExpressApp,
   middleware: RequestHandler,
 ) {
   const config = await getViteConfig();
@@ -225,6 +226,10 @@ function isIgnoredPath(path: string, req: express.Request) {
     : Config.ignorePaths(path, req);
 }
 
+function normalizePath(reqPath: string): string {
+  return reqPath.normalize().replace(/\/\.\.?/g, "");
+}
+
 function findTemplateFilePath(
   reqPath: string,
   root: string,
@@ -254,7 +259,7 @@ function findTemplateFilePath(
 }
 
 async function injectViteHTMLMiddleware(
-  app: core.Express,
+  app: ExpressApp,
   server: ViteDevServer,
 ) {
   const config = await getViteConfig();
@@ -262,9 +267,11 @@ async function injectViteHTMLMiddleware(
   app.use(config.base, async (req, res, next) => {
     if (req.method !== "GET") return next();
 
-    if (isIgnoredPath(req.path, req)) return next();
+    const normalizedPath = normalizePath(req.path);
 
-    const templateFilePath = findTemplateFilePath(req.path, config.root);
+    if (isIgnoredPath(normalizedPath, req)) return next();
+
+    const templateFilePath = findTemplateFilePath(normalizedPath, config.root);
     if (templateFilePath === undefined) return next();
 
     const template = fs.readFileSync(templateFilePath, "utf8");
@@ -285,14 +292,16 @@ async function injectViteHTMLMiddleware(
   });
 }
 
-async function injectHTMLMiddleware(app: core.Express) {
+async function injectHTMLMiddleware(app: ExpressApp) {
   const distPath = await getDistPath();
   const config = await getViteConfig();
 
   app.use(config.base, async (req, res, next) => {
-    if (isIgnoredPath(req.path, req)) return next();
+    const normalizedPath = normalizePath(req.path);
 
-    const templateFilePath = findTemplateFilePath(req.path, distPath);
+    if (isIgnoredPath(normalizedPath, req)) return next();
+
+    const templateFilePath = findTemplateFilePath(normalizedPath, distPath);
     if (templateFilePath === undefined) return next();
 
     let html = fs.readFileSync(templateFilePath, "utf8");
@@ -344,7 +353,7 @@ function config(config: ConfigurationOptions) {
 }
 
 async function bind(
-  app: core.Express,
+  app: ExpressApp,
   server: http.Server | https.Server,
   callback?: () => void,
 ) {
@@ -364,7 +373,7 @@ async function bind(
   callback?.();
 }
 
-function listen(app: core.Express, port: number, callback?: () => void) {
+function listen(app: ExpressApp, port: number, callback?: () => void) {
   const server = app.listen(port, () => bind(app, server, callback));
   return server;
 }

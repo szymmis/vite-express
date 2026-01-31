@@ -4,5 +4,6 @@ export default defineConfig({
   test: {
     bail: 1,
     testTimeout: 60000,
+    hookTimeout: 60000,
   },
 });
