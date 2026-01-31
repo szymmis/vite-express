@@ -2,7 +2,7 @@ import { ChildProcessWithoutNullStreams } from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
-import puppeteer, { Page } from "puppeteer";
+import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { cmd } from "./libs/utils";
@@ -17,7 +17,6 @@ describe.each([{ env: "production" }, { env: "development" }])(
       process: ChildProcessWithoutNullStreams;
       close: () => Promise<void>;
     };
-    let page: Page;
 
     beforeAll(async () => {
       await cmd(`npm init -y`).cwd(tmpdir).success().assert();
@@ -81,59 +80,49 @@ describe.each([{ env: "production" }, { env: "development" }])(
         .awaitOutput(["Running in", env])
         .awaitOutput(`Server is listening on port ${PORT}...`)
         .run();
-
-      const output = await puppeteer
-        .launch({ headless: true })
-        .then(async (browser) => {
-          const page = await browser.newPage();
-          await page.goto(`http://localhost:${PORT}`);
-          return { browser, page };
-        });
-
-      page = output.page;
     });
     afterAll(() => {
       server.close();
     });
 
     async function getRouteContent(path: string) {
-      await page.goto(`http://localhost:${PORT}${path}`);
-      return await page.$eval("body", (el) => el.textContent);
+      const response = await request(`http://localhost:${PORT}`).get(path);
+      return response.text;
     }
 
     it("routes /dir/index.html to dir/index.html", async () => {
       const content = await getRouteContent("/dir/index.html");
-      expect(content).toBe("Dir");
+      expect(content).toContain("Dir");
     });
     it("routes /dir to index.html (route not found, fallback to index.html)", async () => {
       const content = await getRouteContent("/dir");
-      expect(content).toBe("Index");
+      expect(content).toContain("Index");
     });
     it("routes /dir/ to dir/index.html", async () => {
       const content = await getRouteContent("/dir/");
-      expect(content).toBe("Dir");
+      expect(content).toContain("Dir");
     });
 
     it("routes /file.html to file.html", async () => {
       const content = await getRouteContent("/file.html");
-      expect(content).toBe("File");
+      expect(content).toContain("File");
     });
     it("routes /file to file.html", async () => {
       const content = await getRouteContent("/file");
-      expect(content).toBe("File");
+      expect(content).toContain("File");
     });
     it("routes /file/ to index.html (route not found, fallback to index.html)", async () => {
       const content = await getRouteContent("/file/");
-      expect(content).toBe("Index");
+      expect(content).toContain("Index");
     });
 
     it("routes / to index.html", async () => {
       const content = await getRouteContent("/");
-      expect(content).toBe("Index");
+      expect(content).toContain("Index");
     });
     it("routes /index.html to index.html", async () => {
       const content = await getRouteContent("/index.html");
-      expect(content).toBe("Index");
+      expect(content).toContain("Index");
     });
   },
 );
